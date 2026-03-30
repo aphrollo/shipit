@@ -5,51 +5,24 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Five
 ## How it works
 
 ```
-               User request
-                    │
-            ┌───────▼───────┐
-            │  Router (10s) │  ← classifies into 11 task types
-            └───────┬───────┘
-                    │
-            ┌───────▼───────┐
-            │  Orchestrator │  ← dispatches agents in sequence
-            └───────┬───────┘
-                    │
-         ┌──────────▼──────────┐
-         │   Researcher        │  optional — only when hitting unknowns
-         │   "what do we need  │
-         │    to know?"        │
-         └──────────┬──────────┘
-                    │
-         ┌──────────▼──────────┐
-         │   Architect         │  reframe → investigate → plan
-         │   "think, don't     │
-         │    write code"      │
-         └──────────┬──────────┘
-                    │
-         ┌──────────▼──────────┐
-         │   Builder           │  RED → GREEN → REFACTOR
-         │   "the only agent   │
-         │   that edits files" │
-         └──────────┬──────────┘
-                    │
-         ┌──────────▼──────────┐
-         │   Reviewer (cold)   │  receives only the diff — never
-         │   "audit blind"     │  architect reasoning or builder notes
-         └──────────┬──────────┘
-                    │
-         ┌──────────▼──────────┐
-         │   Deployer          │  pre-flight → deploy → canary soak
-         │   "ship + watch"    │
-         └──────────┬──────────┘
-                    │
-         ┌──────────▼──────────┐
-         │   CIP (improve)     │  what slowed us down? what almost
-         │   runs every time   │  went wrong? what should change?
-         └─────────────────────┘
+User request
+ ⎿ Router (10s) — classifies into 11 task types
+    ⎿ Orchestrator — dispatches agents, checks gates, enforces sequence
+       ├─ Researcher (optional)
+       │  ⎿ "what do we need to know?" — codebase exploration, dependency analysis
+       ├─ Architect
+       │  ⎿ reframe → investigate → plan — thinks about what and why, never writes code
+       ├─ Builder
+       │  ⎿ RED → GREEN → REFACTOR — the only agent that edits files
+       ├─ Reviewer (cold)
+       │  ⎿ receives only the diff — never architect reasoning or builder notes
+       ├─ Deployer
+       │  ⎿ pre-flight → deploy → canary soak — ships and watches
+       └─ CIP
+          ⎿ what slowed us down? what almost went wrong? what should change?
 ```
 
-Not every task hits every agent. The router selects the shortest safe path:
+The orchestrator dispatches agents sequentially, checking quality gates between each. Not every task hits every agent — the router selects the shortest safe path:
 
 | Task type | Agent sequence |
 |-----------|---------------|
