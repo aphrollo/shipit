@@ -74,15 +74,16 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**29 skills** across the full lifecycle:
+**32 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
+| Clarify | `/interview` | Socratic requirements clarification with ambiguity scoring — gates readiness |
 | Think | `/reframe`, `/investigate`, `/design-review` | Challenge assumptions, find root causes, audit all 7 UI states + AI slop detection |
 | Design | `/design` | Build/maintain visual design system, constrain UI before code |
 | Plan | `/plan`, `/autoplan` | Files, test cases, order of ops — or one-command auto-reviewed plan |
-| Build | `/build`, `/qa`, `/benchmark` | TDD, Playwright browser testing, Core Web Vitals regression detection |
-| Review | `/review`, `/second-opinion`, `/receiving-review`, `/cso` | Cold review + cross-model validation + feedback evaluation + OWASP security |
+| Build | `/build`, `/qa`, `/visual-qa`, `/benchmark` | TDD, browser testing, screenshot QA, Core Web Vitals regression detection |
+| Review | `/review`, `/second-opinion`, `/receiving-review`, `/cso`, `/deslop` | Cold review + cross-model + feedback eval + OWASP + AI code slop cleanup |
 | Ship | `/ship`, `/deploy`, `/canary`, `/document-release` | Pre-flight, platform-aware deploy, canary soak, post-ship doc audit |
 | Isolation | `/worktrees`, `/freeze` | Git worktrees + edit boundary enforcement |
 | Improve | `/cip`, `/retro`, `/learn` | Per-task improvement, weekly retrospective, cross-session learning |
@@ -145,7 +146,7 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 |  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
 | Architecture | 6 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
-| Skills | 29 skills + 4 hooks | 13 skills | 31 skills |
+| Skills | 32 skills + 4 hooks | 13 skills | 31 skills |
 | Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent + Codex cross-model |
 | Cross-model review | `/second-opinion` (blind, any model pair) | None | `/codex` (requires OpenAI key) |
 | Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |
@@ -175,6 +176,9 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 | Context management | `/context` skill — compact at 50%, avoid dumb zone | None | None |
 | End-of-turn enforcement | Stop hook — mechanical CIP + verification | None | None |
 | Default orchestration | Router auto-dispatches to orchestrate | None | None |
+| Requirements clarification | `/interview` Socratic questioning + ambiguity scoring | None | `/office-hours` YC-style forcing questions |
+| AI code slop cleanup | `/deslop` — 10 code anti-patterns, scan + fix | None | `/ai-slop-cleaner` |
+| Visual screenshot QA | `/visual-qa` — screenshot capture + scoring at 3 breakpoints | None | None |
 | Session bootstrap | `hooks.json` auto-loads router | `hooks.json` auto-loads meta-skill | None |
 
 ## Philosophy
