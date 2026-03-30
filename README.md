@@ -12,7 +12,7 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Five
             └───────┬───────┘
                     │
             ┌───────▼───────┐
-            │  Orchestrator  │  ← dispatches agents in sequence
+            │  Orchestrator │  ← dispatches agents in sequence
             └───────┬───────┘
                     │
          ┌──────────▼──────────┐
