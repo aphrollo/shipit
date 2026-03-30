@@ -106,9 +106,28 @@ After each agent returns, check the gate:
 
 **3 failures at any gate → STOP. Report to user: "[phase] failed 3 times. Different approach needed."**
 
+## Step 3.5: /report hook (conditional — Telegram only)
+
+Before Step 4, check once at workflow start: is the Telegram MCP server available AND is there a `chat_id` from an inbound Telegram message?
+
+**If yes:** Fire `/report` at each phase transition — small status updates sent to the Telegram channel using the haiku model. See `/report` skill for message format.
+
+```
+For each agent in sequence:
+  a. /report → "[phase] starting..."     ← fire-and-forget, never blocks
+  b. Spawn agent
+  c. Check gate
+  d. /report → "[phase] passed/failed"   ← fire-and-forget, never blocks
+```
+
+On workflow complete: `/report` → final summary + react to original message with checkmark (if PASS).
+On escalation: `/report` → warning that user input is needed.
+
+**If no Telegram:** Skip silently. No errors, no fallback. Reports are optional.
+
 ## Step 4: Report
 
-After workflow completes, summarize to user:
+After workflow completes, summarize to user (in the conversation — this is separate from the Telegram /report hook):
 ```
 TASK: [what was done]
 PHASES: [which agents ran]
@@ -155,6 +174,10 @@ Agents can also be invoked standalone via CLI: `claude --agent ~/.claude/agents/
 ## Global Guards
 
 /careful and /verify remain active in the ORCHESTRATOR context (not inside subagents — they have their own safeguards baked into their prompts).
+
+## Conditional Hooks
+
+/report activates only when Telegram MCP server is present and a chat_id exists. Check once at workflow start, store the result. If not available, skip all /report calls silently.
 
 ## Anti-Rationalization
 

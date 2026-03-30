@@ -97,7 +97,7 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**17 skills** across the full lifecycle:
+**18 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
@@ -114,6 +114,12 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 |------|-------------|
 | `/careful` | Blocks `rm -rf`, `DROP TABLE`, `force-push`, `terraform destroy`, etc. — requires explicit confirmation |
 | `/verify` | Bans "should work now", "tests should pass", "looks correct" — requires actual tool-call output as evidence |
+
+**1 conditional hook** (activates when integration is present):
+
+| Hook | What it does |
+|------|-------------|
+| `/report` | Sends small progress updates to Telegram at each phase transition. Uses haiku model for minimal cost. Silent when no Telegram channel is active. |
 
 ## Anti-rationalization
 
