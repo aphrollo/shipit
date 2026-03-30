@@ -1,6 +1,6 @@
 # shipit
 
-Multi-agent development workflow for [Claude Code](https://claude.ai/code). Five specialized agents, mechanically isolated — each owns one job and can't do another's.
+Multi-agent development workflow for [Claude Code](https://claude.ai/code). Six specialized agents, mechanically isolated — each owns one job and can't do another's.
 
 ## How it works
 
@@ -12,6 +12,8 @@ User request
        │  ⎿ "what do we need to know?" — codebase exploration, dependency analysis
        ├─ Architect
        │  ⎿ reframe → investigate → plan — thinks about what and why, never writes code
+       ├─ Designer (optional)
+       │  ⎿ design system → 7-state audit → slop detection — constrains UI before code
        ├─ Builder
        │  ⎿ RED → GREEN → REFACTOR — the only agent that edits files
        ├─ Reviewer (cold)
@@ -31,6 +33,7 @@ The orchestrator dispatches agents sequentially, checking quality gates between 
 | Refactor | architect(plan) → builder → reviewer |
 | Bug fix | architect(investigate) → builder → reviewer |
 | New feature | architect(reframe+plan) → builder → reviewer → deployer |
+| New feature (with UI) | architect(reframe+plan) → designer → builder → reviewer → deployer |
 | Hotfix (prod down) | architect(fast) → builder → reviewer(1-pass) → deployer |
 | Performance | researcher → architect → builder(+benchmark) → reviewer |
 | Migration | researcher → architect → builder → reviewer(+cso) → deployer |
@@ -46,6 +49,7 @@ Single-agent workflows have a bias problem: the same context that wrote the code
 | `builder` | Read, Grep, Glob, Bash, **Edit, Write** | Spawn review agents |
 | `reviewer` | Read, Grep, Glob, Bash, spawn tiebreakers | Edit files |
 | `deployer` | Read, Grep, Glob, Bash | Edit files |
+| `designer` | Read, Grep, Glob, Bash, **Write** (DESIGN.md only) | Edit application code |
 | `researcher` | Read, Grep, Glob, Bash, WebFetch, WebSearch | Edit files |
 
 **The reviewer gets only the git diff + call graph.** No architect reasoning, no builder notes, no "here's why I did it this way." It audits the code cold — the way a real code review should work.
@@ -70,11 +74,12 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**27 skills** across the full lifecycle:
+**28 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
 | Think | `/reframe`, `/investigate`, `/design-review` | Challenge assumptions, find root causes, audit all 7 UI states + AI slop detection |
+| Design | `/design` | Build/maintain visual design system, constrain UI before code |
 | Plan | `/plan`, `/autoplan` | Files, test cases, order of ops — or one-command auto-reviewed plan |
 | Build | `/build`, `/qa`, `/benchmark` | TDD, Playwright browser testing, Core Web Vitals regression detection |
 | Review | `/review`, `/second-opinion`, `/receiving-review`, `/cso` | Cold review + cross-model validation + feedback evaluation + OWASP security |
@@ -137,8 +142,8 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 
 |  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
-| Architecture | 5 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
-| Skills | 27 skills + 3 hooks | 13 skills | 31 skills |
+| Architecture | 6 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
+| Skills | 28 skills + 3 hooks | 13 skills | 31 skills |
 | Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent + Codex cross-model |
 | Cross-model review | `/second-opinion` (blind, any model pair) | None | `/codex` (requires OpenAI key) |
 | Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |

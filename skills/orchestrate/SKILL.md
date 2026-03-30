@@ -22,8 +22,10 @@ Same classification as /router:
 | **Bug (complex/unfamiliar code)** | researcher → architect(investigate+plan) → builder → reviewer |
 | **Hotfix** | architect(investigate-fast) → builder → reviewer(1-pass) → deployer |
 | **New feature** | architect(reframe+plan) → builder → reviewer → deployer |
+| **New feature (with UI)** | architect(reframe+plan) → designer → builder → reviewer → deployer |
 | **New feature (unfamiliar area)** | researcher → architect(reframe+plan) → builder → reviewer → deployer |
 | **Feature change** | architect(reframe+plan) → builder → reviewer → deployer |
+| **Feature change (with UI)** | architect(reframe+plan) → designer → builder → reviewer → deployer |
 | **Migration / deps** | researcher(+deps) → architect(plan) → builder → reviewer(+cso) → deployer |
 | **Performance** | researcher(+profiling) → architect(investigate+plan) → builder(+benchmark) → reviewer |
 
@@ -65,6 +67,12 @@ The `~/.claude/agents/*.md` files are prompt templates, NOT custom agent types. 
 - Error logs/stack traces (for investigate)
 - Which phase(s) to execute (reframe, investigate, plan, design-review)
 
+**Designer receives:**
+- The architect's plan output (specifically UI-related components)
+- Existing project styles (CSS files, Tailwind config, theme files)
+- Current DESIGN.md if one exists
+- Which components need design decisions
+
 **Builder receives:**
 - The architect's plan output (or user's request if no architect phase)
 - Specific files to change and test cases from the plan
@@ -93,6 +101,7 @@ Use the least powerful model that can handle each role to minimize token cost:
 | architect | opus/sonnet | Requires reasoning about architecture and trade-offs |
 | builder | sonnet | Needs to write correct code, but follows a plan |
 | reviewer | sonnet | Needs judgment to assess code quality and security |
+| designer | sonnet | Needs design judgment for visual systems and accessibility |
 | deployer | haiku | Mechanical command execution with checks |
 
 Override up: If a haiku agent fails a gate, retry with sonnet. If sonnet fails, retry with opus. Never override down.
