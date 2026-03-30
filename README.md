@@ -97,15 +97,16 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**18 skills** across the full lifecycle:
+**21 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
 | Think | `/reframe`, `/investigate`, `/design-review` | Challenge assumptions, find root causes, audit all 7 UI states |
 | Plan | `/plan` | Files to change, test cases, order of ops, risk assessment |
 | Build | `/build`, `/qa`, `/benchmark` | TDD, Playwright browser testing, Core Web Vitals regression detection |
-| Review | `/review`, `/cso` | Dual Sonnet subagent audit + OWASP Top 10 / STRIDE threat model |
+| Review | `/review`, `/receiving-review`, `/cso` | Dual Sonnet subagent audit + feedback evaluation + OWASP security |
 | Ship | `/ship`, `/canary` | Pre-flight checks, deploy, post-deploy soak monitoring |
+| Isolation | `/worktrees` | Git worktree creation with auto-setup and safety checks |
 | Improve | `/cip`, `/learn` | Capture what worked, persist patterns cross-session |
 
 **2 global hooks** (always active, all phases, all projects):
@@ -141,6 +142,7 @@ The workflow explicitly counters common shortcuts:
 git clone https://github.com/aphrollo/shipit.git ~/.claude/shipit
 ln -s ~/.claude/shipit/skills/* ~/.claude/skills/
 ln -s ~/.claude/shipit/agents/* ~/.claude/agents/
+cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 ```
 
 Or copy if you prefer to customize:
@@ -149,6 +151,7 @@ Or copy if you prefer to customize:
 git clone https://github.com/aphrollo/shipit.git
 cp -r shipit/skills/* ~/.claude/skills/
 cp -r shipit/agents/* ~/.claude/agents/
+cp shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 ```
 
 ## Requirements
@@ -158,18 +161,30 @@ cp -r shipit/agents/* ~/.claude/agents/
 
 ## How shipit compares
 
-|  | shipit | [superpowers](https://github.com/anthropics/superpowers) | [gstack](https://github.com/garrytan/gstack) |
+|  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
 | Architecture | 5 isolated agents, sequential pipeline | Single agent, skill switching | 23 independent skills |
+| Skills | 21 skills + 3 hooks | 13 skills | 23 skills |
 | Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent (needs OpenAI key) |
+| Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |
 | Disputed findings | Tiebreaker arbitration | Author decides | Author decides |
+| Reviewer trust | "Do Not Trust the Report" — verify by reading code | Trust but verify | Trust |
 | Tool restrictions | Mechanical (reviewer can't edit) | Convention-based | Convention-based |
 | Context isolation | Enforced per agent | Shared context | Shared context |
 | Quality gates | Circuit breakers at every transition | None | None |
+| Model cost optimization | Haiku for mechanical, Sonnet for judgment, auto-upgrade on failure | Manual | Manual |
 | Destructive command guard | `/careful` global hook | None | None |
-| Evidence requirement | `/verify` global hook | None | None |
-| Browser testing | Playwright built in | None | None |
+| Evidence requirement | `/verify` global hook | `verification-before-completion` | None |
+| Git worktrees | `/worktrees` with auto-setup | `using-git-worktrees` | None |
+| Spec/plan persistence | Writes to `docs/shipit/specs/` and `plans/` | Writes to `docs/superpowers/` | None |
+| Reference docs | Root-cause tracing, defense-in-depth, anti-patterns, find-polluter | Same set | None |
+| Browser testing | Playwright built in | Visual companion (mockups) | None |
+| Security audit | `/cso` OWASP + STRIDE | None | None |
+| Post-deploy monitoring | `/canary` soak watch | None | None |
 | Self-improvement | `/cip` after every task | None | None |
+| Cross-session learning | `/learn` persists patterns | None | None |
+| External reporting | `/report` Telegram hook | None | None |
+| Session bootstrap | `hooks.json` auto-loads router | `hooks.json` auto-loads meta-skill | None |
 
 ## Philosophy
 

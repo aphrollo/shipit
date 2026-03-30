@@ -13,6 +13,17 @@ Send BOTH subagents: full git diff, test files for changed modules, upstream cal
 
 **Large diffs (> 500 lines):** Split by module/package. One subagent pair per chunk. ANY chunk FAIL = overall FAIL.
 
+### Subagent skepticism
+
+The spec compliance reviewer MUST verify by reading actual code — not by trusting the builder's report. Builders (like all agents) may claim completion without full implementation. The reviewer must:
+
+1. Read every file listed in the diff
+2. Verify claimed changes actually exist in the code
+3. Check that test assertions test real behavior, not trivially passing stubs
+4. If the builder says "all tests pass", grep for the test file and verify tests exist and are meaningful
+
+**Rule: Do Not Trust the Report.** Verify by reading. Claims without code evidence = FAIL.
+
 ## Subagent 1: Code Auditor (Sonnet)
 
 ```

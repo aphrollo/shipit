@@ -18,4 +18,19 @@ description: When requirements are clear (after /reframe or /investigate) — de
 
 Break into staged milestones with intermediate reviews. Don't try to do everything in one pass.
 
+### Plan persistence
+
+After the user approves the plan, write it to:
+```
+docs/shipit/plans/YYYY-MM-DD-<feature-name>.md
+```
+
+Create the directory if it doesn't exist. The plan document should include:
+- Link to the spec (if one exists)
+- Task list with file paths and test cases
+- Order of operations
+- Risk assessment
+
+This creates an audit trail and lets the builder reference the plan by file path.
+
 ## Next → /build

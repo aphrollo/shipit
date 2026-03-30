@@ -22,6 +22,22 @@ APPROACH: [chosen path]
 SCOPE: [what's in / what's out]
 ```
 
+### Spec persistence
+
+After the user approves the reframed problem statement and scope, write the spec to:
+```
+docs/shipit/specs/YYYY-MM-DD-<topic>-design.md
+```
+
+Create the directory if it doesn't exist. The spec document should include:
+- Problem statement (as approved)
+- Scope (in/out)
+- Approach chosen (with trade-offs noted)
+- Success criteria
+- Open questions (if any)
+
+This creates an audit trail and lets future sessions reference past design decisions.
+
 Do NOT write code. Do NOT explore files. Just think.
 
 ## Next

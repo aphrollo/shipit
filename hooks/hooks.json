@@ -1,0 +1,11 @@
+[
+  {
+    "event": "SessionStart",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "cat ~/.claude/skills/router/SKILL.md 2>/dev/null || echo 'shipit router not found'"
+      }
+    ]
+  }
+]

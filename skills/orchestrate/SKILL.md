@@ -83,6 +83,20 @@ The `~/.claude/agents/*.md` files are prompt templates, NOT custom agent types. 
 - Whether this is dev or prod deploy
 - The "dev before prod" rule
 
+### Model selection
+
+Use the least powerful model that can handle each role to minimize token cost:
+
+| Agent | Recommended model | Rationale |
+|-------|------------------|-----------|
+| researcher | haiku | Mechanical search and summarization |
+| architect | opus/sonnet | Requires reasoning about architecture and trade-offs |
+| builder | sonnet | Needs to write correct code, but follows a plan |
+| reviewer | sonnet | Needs judgment to assess code quality and security |
+| deployer | haiku | Mechanical command execution with checks |
+
+Override up: If a haiku agent fails a gate, retry with sonnet. If sonnet fails, retry with opus. Never override down.
+
 ### Parallel spawning
 
 When agents are independent, spawn them in parallel:
