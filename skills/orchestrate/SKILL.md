@@ -35,23 +35,28 @@ Same classification as /router:
 
 ## Step 2: Dispatch
 
-For each agent in the sequence:
-1. Read the agent's prompt template from `~/.claude/agents/[name].md` (everything below the frontmatter `---`)
-2. Spawn a `general-purpose` Agent, passing the template as the system instructions PLUS the task-specific context
-3. Collect the agent's structured output
+For each agent in the sequence, spawn it using its **plugin-namespaced agent type**:
 
-Example spawn pattern:
 ```
 Agent tool call:
-  subagent_type: general-purpose
+  subagent_type: shipit:builder
   prompt: |
-    [contents of ~/.claude/agents/builder.md body]
-
     --- TASK CONTEXT ---
     [plan output, files to change, etc.]
 ```
 
-The `~/.claude/agents/*.md` files are prompt templates, NOT custom agent types. Always spawn as `general-purpose`.
+### Agent type names (always use the namespaced version):
+
+| Agent | subagent_type |
+|-------|--------------|
+| Researcher | `shipit:researcher` |
+| Architect | `shipit:architect` |
+| Designer | `shipit:designer` |
+| Builder | `shipit:builder` |
+| Reviewer | `shipit:reviewer` |
+| Deployer | `shipit:deployer` |
+
+**IMPORTANT:** When shipit is installed as a plugin, agents are namespaced with the `shipit:` prefix. Using bare names like `researcher` or `builder` will fail with "Agent type not found". Always use `shipit:researcher`, `shipit:builder`, etc.
 
 ### Context passing rules — each agent gets ONLY what it needs:
 
