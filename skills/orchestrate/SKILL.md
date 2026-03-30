@@ -1,11 +1,11 @@
 ---
 name: orchestrate
-description: When code/config/infra changes are requested — classify the task and dispatch phases to specialized subagents (architect, builder, reviewer, deployer) instead of executing inline. Replaces direct /router invocation for multi-agent workflow.
+description: When code/config/infra changes are requested — classify the task and dispatch phases to specialized subagents (architect, builder, reviewer, deployer) instead of executing inline. This is the DEFAULT mode — the router auto-invokes orchestrate for all non-trivial work.
 ---
 
 # Orchestrate
 
-**This skill wraps /router with multi-agent dispatch. Use INSTEAD of /router when you want isolated-context phases.**
+**This is the DEFAULT execution mode. The router auto-invokes orchestrate for all non-trivial work. Inline execution is the fallback, not the default.**
 
 ## Step 1: Classify (10 seconds, inline — no agent spawn)
 

@@ -9,7 +9,18 @@ description: When user asks to build, fix, change, add, remove, or refactor code
 
 **Auto-trigger:** Invoke immediately when code/config/infra changes are requested.
 
-**User override:** "skip it" / "just do it" → BUILD → REVIEW → SHIP. Never skip REVIEW or SHIP.
+## Default Mode: Orchestrate
+
+**All non-trivial work MUST go through `/orchestrate` (multi-agent dispatch).** This is the default — not an option to choose.
+
+After classifying the task, invoke `/orchestrate` to dispatch isolated agents. Do NOT run phases inline unless the user explicitly says "inline".
+
+Why: Inline execution skips agent isolation, context separation, and mechanical enforcement of CIP. The orchestrator ensures every phase runs, every gate is checked, and CIP fires at the end. Without it, steps get skipped.
+
+**User overrides:**
+- "inline" → run phases inline without agent dispatch (fallback mode)
+- "skip it" / "just do it" → BUILD → REVIEW → SHIP via orchestrate. Never skip REVIEW or SHIP.
+- "just build" → builder only (spike mode)
 
 ## CLASSIFY (10 seconds)
 
