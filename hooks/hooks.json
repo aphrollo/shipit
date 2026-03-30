@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before marking this task complete: (1) Did you run verification commands and show actual tool output? Claiming 'should work' without evidence violates /verify. (2) If this was a multi-step implementation task, did you run CIP? Answer the 3 questions: what slowed us down, what almost went wrong, what should change. CIP is mandatory after every workflow — not optional, not skippable."
+          }
+        ]
+      }
     ]
   }
 }
