@@ -11,18 +11,6 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "printf '{\"stopReason\":\"end_turn\",\"systemMessage\":\"Before marking complete: (1) Did you show verification tool output? (2) If multi-step task, run CIP: what slowed us down, what almost went wrong, what should change.\"}'",
-            "timeout": 5000
-          }
-        ]
-      }
     ]
   }
 }

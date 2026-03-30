@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Multi-agent development workflows, quality gates, and continuous improvement tools",
-    "version": "0.0.9"
+    "version": "0.0.10"
   },
   "plugins": [
     {
       "name": "shipit",
       "source": "./",
       "description": "Multi-agent development workflow: 5 isolated agents, 21 skills, TDD, cold review, quality gates, and continuous improvement",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "strict": true
     }
   ]
