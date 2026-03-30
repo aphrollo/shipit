@@ -74,7 +74,7 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**28 skills** across the full lifecycle:
+**29 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
@@ -86,13 +86,15 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 | Ship | `/ship`, `/deploy`, `/canary`, `/document-release` | Pre-flight, platform-aware deploy, canary soak, post-ship doc audit |
 | Isolation | `/worktrees`, `/freeze` | Git worktrees + edit boundary enforcement |
 | Improve | `/cip`, `/retro`, `/learn` | Per-task improvement, weekly retrospective, cross-session learning |
+| Context | `/context` | Window management — compact proactively, avoid the "agent dumb zone" |
 
-**2 global hooks** (always active, all phases, all projects):
+**3 global hooks** (always active, all phases, all projects):
 
 | Hook | What it does |
 |------|-------------|
 | `/careful` | Blocks `rm -rf`, `DROP TABLE`, `force-push`, `terraform destroy`, etc. — requires explicit confirmation |
 | `/verify` | Bans "should work now", "tests should pass", "looks correct" — requires actual tool-call output as evidence |
+| Stop hook | Fires at end of every turn — mechanically enforces verification evidence and CIP execution |
 
 **1 conditional hook** (activates when integration is present):
 
@@ -143,7 +145,7 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 |  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
 | Architecture | 6 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
-| Skills | 28 skills + 3 hooks | 13 skills | 31 skills |
+| Skills | 29 skills + 4 hooks | 13 skills | 31 skills |
 | Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent + Codex cross-model |
 | Cross-model review | `/second-opinion` (blind, any model pair) | None | `/codex` (requires OpenAI key) |
 | Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |
@@ -170,6 +172,9 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 | Self-improvement | `/cip` after every task | None | None |
 | Cross-session learning | `/learn` persists patterns | None | `/learn` with search + prune |
 | External reporting | `/report` Telegram hook | None | None |
+| Context management | `/context` skill — compact at 50%, avoid dumb zone | None | None |
+| End-of-turn enforcement | Stop hook — mechanical CIP + verification | None | None |
+| Default orchestration | Router auto-dispatches to orchestrate | None | None |
 | Session bootstrap | `hooks.json` auto-loads router | `hooks.json` auto-loads meta-skill | None |
 
 ## Philosophy
