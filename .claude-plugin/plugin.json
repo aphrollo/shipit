@@ -1,0 +1,23 @@
+{
+  "name": "shipit",
+  "description": "Multi-agent development workflow for Claude Code: 5 isolated agents, 21 skills, TDD, cold review, quality gates, and continuous improvement",
+  "version": "2.0.0",
+  "author": {
+    "name": "Aphrollo",
+    "email": "hello@aphrollo.com"
+  },
+  "homepage": "https://github.com/aphrollo/shipit",
+  "repository": "https://github.com/aphrollo/shipit",
+  "license": "MIT",
+  "keywords": [
+    "multi-agent",
+    "workflow",
+    "tdd",
+    "code-review",
+    "orchestration",
+    "skills",
+    "quality-gates",
+    "security",
+    "continuous-improvement"
+  ]
+}

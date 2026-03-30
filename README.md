@@ -137,21 +137,22 @@ The workflow explicitly counters common shortcuts:
 
 ## Install
 
+### Plugin (recommended — auto-updates)
+
+```
+/plugin marketplace add aphrollo/shipit
+/plugin install shipit@aphrollo-shipit
+```
+
+That's it. Skills, agents, and hooks are installed automatically. When the repo is updated, Claude Code pulls the latest version at startup (enable auto-update in `/plugin` → Marketplaces).
+
+### Manual (if you prefer full control)
+
 ```bash
-# Clone and symlink (recommended — easy to update)
 git clone https://github.com/aphrollo/shipit.git ~/.claude/shipit
 ln -s ~/.claude/shipit/skills/* ~/.claude/skills/
 ln -s ~/.claude/shipit/agents/* ~/.claude/agents/
 cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
-```
-
-Or copy if you prefer to customize:
-
-```bash
-git clone https://github.com/aphrollo/shipit.git
-cp -r shipit/skills/* ~/.claude/skills/
-cp -r shipit/agents/* ~/.claude/agents/
-cp shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 ```
 
 ## Requirements

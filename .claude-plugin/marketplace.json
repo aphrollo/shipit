@@ -1,0 +1,21 @@
+{
+  "name": "shipit-marketplace",
+  "description": "Multi-agent development workflows and tools by Aphrollo",
+  "owner": {
+    "name": "Aphrollo",
+    "email": "hello@aphrollo.com"
+  },
+  "metadata": {
+    "description": "Multi-agent development workflows, quality gates, and continuous improvement tools",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "shipit",
+      "source": "./",
+      "description": "Multi-agent development workflow: 5 isolated agents, 21 skills, TDD, cold review, quality gates, and continuous improvement",
+      "version": "2.0.0",
+      "strict": true
+    }
+  ]
+}
