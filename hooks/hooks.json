@@ -1,11 +1,16 @@
-[
-  {
-    "event": "SessionStart",
-    "hooks": [
+{
+  "hooks": {
+    "SessionStart": [
       {
-        "type": "command",
-        "command": "cat ~/.claude/skills/router/SKILL.md 2>/dev/null || echo 'shipit router not found'"
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat \"${CLAUDE_PLUGIN_ROOT}/skills/router/SKILL.md\" 2>/dev/null || echo 'shipit router not found'",
+            "async": false
+          }
+        ]
       }
     ]
   }
-]
+}
