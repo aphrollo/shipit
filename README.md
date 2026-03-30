@@ -70,17 +70,17 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 
 ## What's included
 
-**21 skills** across the full lifecycle:
+**27 skills** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
-| Think | `/reframe`, `/investigate`, `/design-review` | Challenge assumptions, find root causes, audit all 7 UI states |
-| Plan | `/plan` | Files to change, test cases, order of ops, risk assessment |
+| Think | `/reframe`, `/investigate`, `/design-review` | Challenge assumptions, find root causes, audit all 7 UI states + AI slop detection |
+| Plan | `/plan`, `/autoplan` | Files, test cases, order of ops — or one-command auto-reviewed plan |
 | Build | `/build`, `/qa`, `/benchmark` | TDD, Playwright browser testing, Core Web Vitals regression detection |
-| Review | `/review`, `/receiving-review`, `/cso` | Dual Sonnet subagent audit + feedback evaluation + OWASP security |
-| Ship | `/ship`, `/canary` | Pre-flight checks, deploy, post-deploy soak monitoring |
-| Isolation | `/worktrees` | Git worktree creation with auto-setup and safety checks |
-| Improve | `/cip`, `/learn` | Capture what worked, persist patterns cross-session |
+| Review | `/review`, `/second-opinion`, `/receiving-review`, `/cso` | Cold review + cross-model validation + feedback evaluation + OWASP security |
+| Ship | `/ship`, `/deploy`, `/canary`, `/document-release` | Pre-flight, platform-aware deploy, canary soak, post-ship doc audit |
+| Isolation | `/worktrees`, `/freeze` | Git worktrees + edit boundary enforcement |
+| Improve | `/cip`, `/retro`, `/learn` | Per-task improvement, weekly retrospective, cross-session learning |
 
 **2 global hooks** (always active, all phases, all projects):
 
@@ -137,26 +137,33 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 
 |  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
-| Architecture | 5 isolated agents, sequential pipeline | Single agent, skill switching | 23 independent skills |
-| Skills | 21 skills + 3 hooks | 13 skills | 23 skills |
-| Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent (needs OpenAI key) |
+| Architecture | 5 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
+| Skills | 27 skills + 3 hooks | 13 skills | 31 skills |
+| Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent + Codex cross-model |
+| Cross-model review | `/second-opinion` (blind, any model pair) | None | `/codex` (requires OpenAI key) |
 | Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |
 | Disputed findings | Tiebreaker arbitration | Author decides | Author decides |
-| Reviewer trust | "Do Not Trust the Report" — verify by reading code | Trust but verify | Trust |
+| Reviewer trust | "Do Not Trust the Report" — verify by reading code | Trust but verify | Confidence scores 1-10 |
 | Tool restrictions | Mechanical (reviewer can't edit) | Convention-based | Convention-based |
 | Context isolation | Enforced per agent | Shared context | Shared context |
 | Quality gates | Circuit breakers at every transition | None | None |
 | Model cost optimization | Haiku for mechanical, Sonnet for judgment, auto-upgrade on failure | Manual | Manual |
-| Destructive command guard | `/careful` global hook | None | None |
+| Automated planning | `/autoplan` (reframe → design → plan in one command) | None | `/autoplan` (CEO → design → eng review) |
+| AI slop detection | 10 anti-pattern scoring (A-F) in `/design-review` | None | 10 anti-pattern scoring in `/design-review` |
+| Deploy automation | `/deploy` with 9-platform auto-detection | None | `/land-and-deploy` with platform detection |
+| Post-ship docs | `/document-release` auto-updates stale docs | None | `/document-release` auto-invoked by `/ship` |
+| Edit boundary | `/freeze` locks edits to one directory | None | `/freeze` + `/guard` |
+| Weekly retrospective | `/retro` with commit analysis and metrics | None | `/retro` with contributor breakdowns |
+| Destructive command guard | `/careful` global hook | None | `/careful` hook |
 | Evidence requirement | `/verify` global hook | `verification-before-completion` | None |
 | Git worktrees | `/worktrees` with auto-setup | `using-git-worktrees` | None |
-| Spec/plan persistence | Writes to `docs/specs/` and `docs/plans/` | Writes to `docs/superpowers/` | None |
+| Spec/plan persistence | Writes to `docs/specs/` and `docs/plans/` | Writes to `docs/superpowers/` | `~/.gstack/projects/` |
 | Reference docs | Root-cause tracing, defense-in-depth, anti-patterns, find-polluter | Same set | None |
-| Browser testing | Playwright built in | Visual companion (mockups) | None |
-| Security audit | `/cso` OWASP + STRIDE | None | None |
-| Post-deploy monitoring | `/canary` soak watch | None | None |
+| Browser testing | Playwright built in | Visual companion (mockups) | Persistent browser daemon (~100ms) |
+| Security audit | `/cso` OWASP + STRIDE | None | `/cso` OWASP + STRIDE |
+| Post-deploy monitoring | `/canary` soak watch | None | `/canary` periodic snapshots |
 | Self-improvement | `/cip` after every task | None | None |
-| Cross-session learning | `/learn` persists patterns | None | None |
+| Cross-session learning | `/learn` persists patterns | None | `/learn` with search + prune |
 | External reporting | `/report` Telegram hook | None | None |
 | Session bootstrap | `hooks.json` auto-loads router | `hooks.json` auto-loads meta-skill | None |
 

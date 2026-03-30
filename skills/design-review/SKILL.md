@@ -42,4 +42,30 @@ STALE: [how handled]
 
 Incomplete rows = gate not cleared.
 
+## AI Slop Detection
+
+Score the design against these 10 blacklisted anti-patterns commonly produced by AI. Each violation deducts from the AI Slop Score (A = clean, F = heavy slop):
+
+| # | Anti-Pattern | What to look for |
+|---|-------------|-----------------|
+| 1 | Gradient hero backgrounds | Linear gradients as primary visual element instead of real content |
+| 2 | 3-column feature grids | Three equal cards with icon + heading + paragraph (the "SaaS starter kit" layout) |
+| 3 | Centered card layouts | Everything centered with generous whitespace but no visual hierarchy |
+| 4 | Emoji as decoration | Emoji used as section icons or bullet replacements |
+| 5 | Generic stock copy | "Streamline your workflow", "Built for teams", "Get started today" |
+| 6 | Pill-shaped buttons everywhere | Rounded buttons with gradient fills as the only CTA style |
+| 7 | Fake testimonials | Placeholder testimonials with stock headshots or avatar initials |
+| 8 | Floating cards with shadows | Multiple cards with identical box-shadows floating on light gray backgrounds |
+| 9 | Animated counters | "10,000+ users", "99.9% uptime" with scroll-triggered number animations |
+| 10 | Dark mode as personality | Dark background used as a substitute for actual visual identity |
+
+**Scoring:**
+- 0 violations = A (clean design)
+- 1-2 violations = B (minor slop, flag it)
+- 3-4 violations = C (needs design attention)
+- 5-6 violations = D (significant AI slop)
+- 7+ violations = F (redesign needed)
+
+**Report AI Slop Score alongside the design review.** If score is C or below, recommend specific alternatives for each violation.
+
 ## Next → /plan

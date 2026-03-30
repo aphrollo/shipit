@@ -25,4 +25,13 @@ Dev server for testing. Production only on explicit user approval.
 - [ ] Check logs for errors (last 2 min)
 - [ ] Verify dependent services still running
 
+## Post-Ship Automation
+
+After pre-flight checks pass and code is ready:
+1. **Auto-suggest `/deploy`** if a deploy platform is detected in the project
+2. **Auto-invoke `/document-release`** to audit documentation for staleness
+3. **Auto-invoke `/cip`** for continuous improvement (already mandatory)
+
+This chain ensures: ship → deploy → document → improve.
+
 ## Next → /canary (if deployed to production) or /cip
