@@ -176,7 +176,7 @@ cp shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 | Destructive command guard | `/careful` global hook | None | None |
 | Evidence requirement | `/verify` global hook | `verification-before-completion` | None |
 | Git worktrees | `/worktrees` with auto-setup | `using-git-worktrees` | None |
-| Spec/plan persistence | Writes to `docs/shipit/specs/` and `plans/` | Writes to `docs/superpowers/` | None |
+| Spec/plan persistence | Writes to `docs/specs/` and `docs/plans/` | Writes to `docs/superpowers/` | None |
 | Reference docs | Root-cause tracing, defense-in-depth, anti-patterns, find-polluter | Same set | None |
 | Browser testing | Playwright built in | Visual companion (mockups) | None |
 | Security audit | `/cso` OWASP + STRIDE | None | None |

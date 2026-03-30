@@ -22,7 +22,7 @@ Break into staged milestones with intermediate reviews. Don't try to do everythi
 
 After the user approves the plan, write it to:
 ```
-docs/shipit/plans/YYYY-MM-DD-<feature-name>.md
+docs/plans/YYYY-MM-DD-<feature-name>.md
 ```
 
 Create the directory if it doesn't exist. The plan document should include:

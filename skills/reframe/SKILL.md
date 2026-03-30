@@ -26,7 +26,7 @@ SCOPE: [what's in / what's out]
 
 After the user approves the reframed problem statement and scope, write the spec to:
 ```
-docs/shipit/specs/YYYY-MM-DD-<topic>-design.md
+docs/specs/YYYY-MM-DD-<topic>-design.md
 ```
 
 Create the directory if it doesn't exist. The spec document should include:
