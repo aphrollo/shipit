@@ -8,7 +8,7 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Five
                User request
                     │
             ┌───────▼───────┐
-            │  Router (10s)  │  ← classifies into 11 task types
+            │  Router (10s) │  ← classifies into 11 task types
             └───────┬───────┘
                     │
             ┌───────▼───────┐
@@ -23,14 +23,14 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Five
                     │
          ┌──────────▼──────────┐
          │   Architect         │  reframe → investigate → plan
-         │   "think, don't    │
+         │   "think, don't     │
          │    write code"      │
          └──────────┬──────────┘
                     │
          ┌──────────▼──────────┐
          │   Builder           │  RED → GREEN → REFACTOR
          │   "the only agent   │
-         │    that edits files" │
+         │   that edits files" │
          └──────────┬──────────┘
                     │
          ┌──────────▼──────────┐
