@@ -49,6 +49,11 @@ Abbreviated: REPRODUCE + ROOT CAUSE only. Skip TRACE/HYPOTHESIZE/VERIFY when the
 | Flaky/intermittent bug | Reproduces sometimes but not consistently | High | Add logging/instrumentation to capture state on next occurrence. Check for race conditions, timing, shared state. |
 | Stack trace points to wrong location | Error originates upstream of reported location | Medium | Trace data flow backward from error. The symptom is not the cause. |
 
+## References
+
+- `references/root-cause-tracing.md` — detailed root cause tracing methodology
+- `references/defense-in-depth.md` — defensive investigation patterns
+
 ## Routing After
 
 - Simple implementation fix → /plan → /build

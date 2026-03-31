@@ -53,4 +53,8 @@ Source files should stay under 500 LOC of logic. If a file grows past this, spli
 | Build tool crash / environment issue | npm/go/cargo errors unrelated to code | Medium | Fix environment (install deps, clear cache). If persists after 2 attempts, escalate. |
 | Implementation contradicts plan | Code requires different approach than planned | Medium | STOP. Return to /plan with findings. Update plan before continuing. |
 
+## References
+
+- `references/testing-anti-patterns.md` — common testing mistakes to avoid during RED/GREEN/REFACTOR
+
 ## Next → /deslop (--auto mode) → /qa (if UI/frontend changed) or /review

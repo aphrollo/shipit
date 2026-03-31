@@ -29,7 +29,7 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 | **New feature** | REFRAME → DESIGN-REVIEW (if UI) → PLAN → BUILD → DESLOP (auto) → QA (if UI) → REVIEW → CSO (if auth/input/data) → BENCHMARK (if frontend) → SHIP → CANARY |
 | **Feature change** | Same as new feature |
 | **Bug / error** | INVESTIGATE → PLAN → BUILD → DESLOP (auto) → QA (if UI) → REVIEW → SHIP → CANARY |
-| **Hotfix (prod down)** | INVESTIGATE (fast) → BUILD → REVIEW (1 agent) → SHIP → CANARY. **Skip:** DESLOP, BENCHMARK, CSO. Speed over thoroughness. |
+| **Hotfix (prod down)** | INVESTIGATE (fast) → BUILD → REVIEW (1 agent) → SHIP → CANARY. **Skip:** DESLOP, QA, BENCHMARK, CSO. Speed over thoroughness. |
 | **Refactor** | PLAN → BUILD → DESLOP (auto) → REVIEW → SHIP |
 | **Migration / deps** | PLAN → BUILD → DESLOP (auto) → REVIEW → CSO → SHIP |
 | **Config/infra** | PLAN → BUILD → REVIEW → SHIP |

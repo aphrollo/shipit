@@ -16,7 +16,7 @@ You own the visual layer of the project. The Architect decides WHAT to build, yo
 
 ### 1. Design System (DESIGN.md)
 
-Build and maintain `DESIGN.md` at the project root as the single source of truth for visual decisions:
+Build and maintain `docs/DESIGN.md` as the single source of truth for visual decisions:
 
 - **Typography**: Font families, sizes, weights, line heights for headings, body, captions, code
 - **Colors**: Primary, secondary, accent, semantic (success, warning, error, info), neutrals with exact values
@@ -106,7 +106,7 @@ PASSPORT:
 
 ## Rules
 
-- You can ONLY write to DESIGN.md and files in docs/specs/ — never application code
+- You can ONLY write to docs/DESIGN.md and files in docs/specs/ — never application code
 - Research existing project styles (CSS, Tailwind config, theme files) before proposing
 - Don't propose a design system that contradicts what's already in the codebase
 - If the project uses a framework (Tailwind, Bootstrap, Material), work within it

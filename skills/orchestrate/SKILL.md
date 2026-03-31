@@ -7,7 +7,18 @@ description: When code/config/infra changes are requested — classify the task 
 
 **This is the DEFAULT execution mode. The router auto-invokes orchestrate for all non-trivial work. Inline execution is the fallback, not the default.**
 
-## Step 1: Classify (10 seconds, inline — no agent spawn)
+## Step 1: Resume Checkpoint
+
+Check for an existing checkpoint before starting (see `shared/checkpointing.md`):
+
+1. Read `docs/.shipit-checkpoint.json` if it exists
+2. If checkpoint matches current task → offer resume to user
+3. If checkpoint is stale (>4h) → recommend fresh start
+4. If no checkpoint → proceed normally
+
+On resume: validate all passport expiry times, re-run expired phases, resume from pending_phase.
+
+## Step 2: Classify + Check Plan Cache (10 seconds, inline — no agent spawn)
 
 Same classification as /router:
 
@@ -34,17 +45,6 @@ Same classification as /router:
 **Deslop integration:** After builder completes and before reviewer, run `/deslop --auto` on the builder's changes. This is automatic and non-blocking — it cleans AI code patterns before review sees them. If deslop finds score > 15/30, flag to user but don't block.
 
 **Research rule:** When ANY phase hits an unknown — unfamiliar API, unclear behavior, "how does X work?" — spawn researcher instead of exploring inline. Even on trivial tasks. Inline research pollutes the orchestrator's context. The researcher's context is disposable.
-
-## Step 0.5: Checkpoint Resume Check
-
-Before starting a new workflow, check for an existing checkpoint (see `shared/checkpointing.md`):
-
-1. Read `docs/.shipit-checkpoint.json` if it exists
-2. If checkpoint matches current task → offer resume to user
-3. If checkpoint is stale (>4h) → recommend fresh start
-4. If no checkpoint → proceed normally
-
-On resume: validate all passport expiry times, re-run expired phases, resume from pending_phase.
 
 ## Handoff Schemas & Material Passports
 
@@ -77,7 +77,7 @@ The orchestrator tracks agent retries using fingerprinting and progress detectio
 
 This works WITH circuit breakers: breakers catch 3 real failures, loop detection catches identical failures faster.
 
-## Step 2: Dispatch
+## Step 3: Dispatch
 
 For each agent in the sequence, spawn it using its **plugin-namespaced agent type**:
 
@@ -178,11 +178,11 @@ Before each agent runs, check if its inputs are stale:
 
 When in doubt, re-run — fresh data is cheap, stale bugs are expensive.
 
-## Step 3: Gate checks (inline — no agent spawn)
+## Step 4: Gate checks (inline — no agent spawn)
 
 After each agent returns, the orchestrator runs THREE checks in order:
 
-### 3a. Passport validation
+### 4a. Passport validation
 - Parse the PASSPORT block from agent output
 - Verify required fields: artifact, version, created_at, created_by, based_on, content_summary
 - Check that `based_on` references match artifacts the orchestrator has in session
@@ -190,7 +190,7 @@ After each agent returns, the orchestrator runs THREE checks in order:
 - Set status to VERIFIED if all checks pass
 - Missing PASSPORT block → warn agent but don't block (graceful degradation)
 
-### 3b. Schema validation
+### 4b. Schema validation
 - Validate agent output against the handoff schema for its type (see `shared/handoff_schemas.md`)
 - Check all required fields present and non-empty
 - Run type checks (enums match, lists are lists, etc.)
@@ -198,7 +198,7 @@ After each agent returns, the orchestrator runs THREE checks in order:
 - Run contradiction checks (e.g., PASS + CRITICAL findings = auto-correct to FAIL)
 - **HANDOFF_INCOMPLETE** → return to agent with: "HANDOFF_INCOMPLETE: missing [field1, field2]. Re-run and include these." Max 2 retries.
 
-### 3c. Gate check
+### 4c. Gate check
 - Evaluate pass/fail condition for the agent type:
 
 | Agent | PASS condition | On FAIL |
@@ -210,22 +210,23 @@ After each agent returns, the orchestrator runs THREE checks in order:
 | reviewer | REVIEW_HANDOFF valid: result=PASS, critical_count=0, high_count=0 | Feed findings to builder via /receiving-review, re-review after fix (max 3 cycles) |
 | deployer | DEPLOY_HANDOFF valid: result=PASS, preflight=PASS | Alert user immediately. Do NOT auto-rollback without approval. |
 
-### 3d. Staleness check on next agent's inputs
+### 4d. Staleness check on next agent's inputs
 - Before spawning the NEXT agent, check `expires_at` on all parent artifacts it depends on
 - If any parent is expired → re-run the expired agent first
 - Pass artifact IDs + content_summaries to the next agent in its prompt
 
-### 3e. Checkpoint save
-- After gate check PASSES, save checkpoint to `docs/.shipit-checkpoint.json` (see `shared/checkpointing.md`)
-- Record: completed phase, artifact ID, passport, output summary
-- This enables resume if the orchestrator crashes before the next agent completes
-
 **3 failures at any gate → STOP. Report to user: "[phase] failed 3 times. Different approach needed."**
 **But first**: check loop detection — if fingerprints are identical, change approach before counting as a real failure.
 
-## Step 3.5: /report hook (conditional — Telegram only)
+## Step 5: Save Checkpoint
 
-Before Step 4, check once at workflow start: is the Telegram MCP server available AND is there a `chat_id` from an inbound Telegram message?
+After gate check PASSES, save checkpoint to `docs/.shipit-checkpoint.json` (see `shared/checkpointing.md`):
+- Record: completed phase, artifact ID, passport, output summary
+- This enables resume if the orchestrator crashes before the next agent completes
+
+## /report hook (conditional — Telegram only, runs between steps)
+
+Check once at workflow start: is the Telegram MCP server available AND is there a `chat_id` from an inbound Telegram message?
 
 **If yes:** Fire `/report` at each phase transition — small status updates sent to the Telegram channel using the haiku model. See `/report` skill for message format.
 
@@ -242,7 +243,7 @@ On escalation: `/report` → warning that user input is needed.
 
 **If no Telegram:** Skip silently. No errors, no fallback. Reports are optional.
 
-## Step 4: Report
+## Step 6: Report + Collect Metrics
 
 After workflow completes, summarize to user (in the conversation — this is separate from the Telegram /report hook):
 ```
@@ -260,9 +261,7 @@ PROVENANCE CHAIN:
 
 The provenance chain is constructed from material passports collected during the workflow. It enables post-incident traceability — if something breaks in prod, follow the chain to find which plan, build, and review led to the deploy.
 
-## Step 4.5: Workflow Metrics
-
-Append a metrics record to `docs/.shipit-metrics.jsonl` (see `shared/workflow_metrics.md`):
+Also append a metrics record to `docs/.shipit-metrics.jsonl` (see `shared/workflow_metrics.md`):
 - Workflow result, classification, duration, agents used
 - Per-agent results, retry counts, models used, durations
 - Gate failures, loop detections, handoff incomplete counts
@@ -275,18 +274,17 @@ Every 10th workflow, auto-analyze aggregates:
 
 Metrics make /cip and /retro data-driven instead of anecdotal.
 
-## Step 4.6: Checkpoint Cleanup
-
-- Workflow PASS → delete `docs/.shipit-checkpoint.json` (workflow completed successfully)
+**Checkpoint cleanup:**
+- Workflow PASS → delete `docs/.shipit-checkpoint.json`
 - Workflow FAIL (escalated) → keep checkpoint (user may resume later)
 
-## Step 4.7: Plan Cache Update
+## Step 7: Update Plan Cache
 
 - Workflow PASS → capture plan template if new task pattern, or increment success count for existing template
 - Workflow FAIL at builder or later → increment failure count for matched template
 - Workflow FAIL at architect → flag template for review (may be wrong)
 
-## Step 5: CIP (mandatory — the ONLY place CIP runs, never skip)
+## Step 8: CIP (mandatory — the ONLY place CIP runs, never skip)
 
 After EVERY workflow completion (PASS or FAIL), run /cip inline. Do NOT ask whether to run it. Do NOT skip it. This is the continuous improvement loop that makes the workflow better over time.
 
