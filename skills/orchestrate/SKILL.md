@@ -79,8 +79,30 @@ This works WITH circuit breakers: breakers catch 3 real failures, loop detection
 
 ## Step 3: Dispatch
 
-For each agent in the sequence, spawn it using its **plugin-namespaced agent type**:
+**Telegram check (once, at start of Step 3):** Is `telegram__reply` available AND is there a `chat_id` from an inbound Telegram message? Store the answer. If yes, every agent dispatch follows the reporting loop below. If no, skip all Telegram calls silently.
 
+For each agent in the sequence, follow this loop:
+
+```
+For EACH agent:
+  1. IF Telegram active → telegram__reply: "[emoji] [Phase] starting... Task: [one-line]"
+  2. Spawn agent (see dispatch rules below)
+  3. Run gate check (Step 4)
+  4. IF Telegram active → telegram__reply: "[check/cross] [Phase] passed/failed — [one-line result]"
+
+On workflow complete:
+  IF Telegram active → telegram__reply: "Done — [PASS/FAIL]. Phases: [list]. Changes: [N files]."
+  IF Telegram active AND PASS → telegram__react to original message with checkmark
+
+On escalation (3 failures):
+  IF Telegram active → telegram__reply: "Escalated — [phase] failed 3 times. Needs user input."
+```
+
+**This is NOT optional when Telegram is active.** The reporting loop is part of the dispatch — not a separate step. If you dispatch an agent, you report it.
+
+Emoji map: Researcher=🔍 Architect=✏️ Designer=🎨 Builder=🔧 Reviewer=👀 Deployer=🚀 CIP=📈
+
+Agent spawn template:
 ```
 Agent tool call:
   subagent_type: shipit:builder
@@ -223,25 +245,6 @@ After each agent returns, the orchestrator runs THREE checks in order:
 After gate check PASSES, save checkpoint to `docs/.shipit-checkpoint.json` (see `shared/checkpointing.md`):
 - Record: completed phase, artifact ID, passport, output summary
 - This enables resume if the orchestrator crashes before the next agent completes
-
-## /report hook (conditional — Telegram only, runs between steps)
-
-Check once at workflow start: is the Telegram MCP server available AND is there a `chat_id` from an inbound Telegram message?
-
-**If yes:** Fire `/report` at each phase transition — small status updates sent to the Telegram channel using the haiku model. See `/report` skill for message format.
-
-```
-For each agent in sequence:
-  a. /report → "[phase] starting..."     ← fire-and-forget, never blocks
-  b. Spawn agent
-  c. Check gate
-  d. /report → "[phase] passed/failed"   ← fire-and-forget, never blocks
-```
-
-On workflow complete: `/report` → final summary + react to original message with checkmark (if PASS).
-On escalation: `/report` → warning that user input is needed.
-
-**If no Telegram:** Skip silently. No errors, no fallback. Reports are optional.
 
 ## Step 6: Report + Collect Metrics
 
