@@ -7,32 +7,32 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Six 
 ```
 User request
  ⎿ Router (10s) — classifies into 11 task types
-    ⎿ Orchestrator — dispatches agents, checks gates, enforces sequence
+    ⎿ Orchestrator
        │
-       │  [Step 0.5] Check for checkpoint — resume crashed workflow?
-       │  [Step 1]   Classify task type
-       │  [Step 2]   Dispatch agents with typed handoff schemas
+       │  [1] Resume checkpoint (if crashed workflow exists)
+       │  [2] Classify task type + check plan cache
+       │  [3] Dispatch agents ↓
        │
        ├─ Researcher (optional)
-       │  ⎿ "what do we need to know?" — codebase exploration, dependency analysis
+       │  ⎿ codebase exploration, dependency analysis, web research
        ├─ Architect
-       │  ⎿ reframe → investigate → plan — thinks about what and why, never writes code
+       │  ⎿ reframe → investigate → plan — never writes code
        ├─ Designer (optional)
-       │  ⎿ design system → 7-state audit → slop detection — constrains UI before code
+       │  ⎿ design system → 7-state audit → AI slop detection
        ├─ Builder
        │  ⎿ RED → GREEN → REFACTOR — the only agent that edits files
        ├─ Deslop (automatic)
-       │  ⎿ AI code cleanup — removes slop before review sees it
+       │  ⎿ cleans AI code slop before review sees it
        ├─ Reviewer (cold)
-       │  ⎿ receives only the diff — never architect reasoning or builder notes
+       │  ⎿ receives only the diff — never architect or builder notes
        ├─ Deployer
-       │  ⎿ pre-flight → deploy → canary soak — ships and watches
+       │  ⎿ pre-flight → deploy → canary soak
        │
-       │  [Step 3]   Gate check: passport → schema → pass/fail → staleness → checkpoint
-       │  [Step 4]   Report with provenance chain
-       │  [Step 4.5] Collect workflow metrics
-       │  [Step 4.7] Update plan cache
-       │  [Step 5]   CIP — what slowed us? what almost went wrong? what should change?
+       │  [4] Gate check: passport → schema → pass/fail → staleness
+       │  [5] Save checkpoint
+       │  [6] Report with provenance chain + collect metrics
+       │  [7] Update plan cache
+       │  [8] CIP — what slowed us? what almost went wrong? what should change?
        │
        └─ Done
 ```
@@ -159,10 +159,10 @@ The workflow explicitly counters common shortcuts:
 
 ```
 /plugin marketplace add aphrollo/shipit
-/plugin install shipit@aphrollo-shipit
+/plugin install shipit@shipit-marketplace
 ```
 
-That's it. Skills, agents, and hooks are installed automatically. When the repo is updated, Claude Code pulls the latest version at startup (enable auto-update in `/plugin` → Marketplaces).
+That's it. Skills, agents, and hooks are installed automatically. Update with `/plugin marketplace update` + `/plugin update shipit@shipit-marketplace`.
 
 ### Manual (if you prefer full control)
 
@@ -184,7 +184,7 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 |  | shipit | [superpowers](https://github.com/obra/superpowers) | [gstack](https://github.com/garrytan/gstack) |
 |--|--------|------------|--------|
 | Architecture | 6 isolated agents, sequential pipeline | Single agent, skill switching | Single agent, persona switching |
-| Skills | 32 skills + 3 hooks | 13 skills | 31 skills |
+| Skills | 32 skills + 6 shared modules + 3 hooks | 13 skills | 31 skills |
 | Code review | Blind (reviewer sees only diff) | Self-review | Sonnet subagent + Codex cross-model |
 | Cross-model review | `/second-opinion` (blind, any model pair) | None | `/codex` (requires OpenAI key) |
 | Review feedback | `/receiving-review` (evaluate, don't agree) | `receiving-code-review` | None |
