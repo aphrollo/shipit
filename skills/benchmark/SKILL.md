@@ -9,6 +9,15 @@ description: When shipping frontend changes — measure performance before and a
 
 Playwright at `~/.claude/tools/node_modules/playwright`.
 
+## Playwright Verification (run before any benchmark work)
+
+```bash
+node -e "require('playwright')" 2>/dev/null && echo "PLAYWRIGHT: OK" || echo "PLAYWRIGHT: MISSING"
+ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+```
+
+If either is MISSING: `cd ~/.claude/tools && npm install playwright && npx playwright install chromium`. If install fails after 2 attempts → use bundle-size-only fallback (no browser metrics).
+
 ## When to Run
 
 - Before /ship for any frontend change
@@ -76,7 +85,11 @@ VERDICT: PASS / REGRESSED (list blockers)
 
 ## Baseline Storage
 
-Save to `.benchmark-baseline.json` in project root. On first run: capture metrics, output `VERDICT: BASELINE CAPTURED`, save file. On subsequent runs: load baseline, compare, output PASS/REGRESSED.
+Save to `docs/.benchmark-baseline.json`. On first run: capture metrics, output `VERDICT: BASELINE CAPTURED`, save file. On subsequent runs: load baseline, compare, output PASS/REGRESSED.
+
+For monorepos: save to `<package-root>/docs/.benchmark-baseline.json` (one baseline per package).
+
+**Staleness:** Baselines older than 24 hours should be recaptured before comparing. Check file modification time before using.
 
 ## Fallback
 

@@ -94,6 +94,14 @@ DESIGN DECISIONS:
 
 CONSTRAINTS FOR BUILDER:
 - [specific visual requirements the builder must follow]
+
+PASSPORT:
+  artifact: design-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: designer ([model])
+  based_on: [plan artifact ID from orchestrator prompt]
+  content_summary: [one line — design system status + slop score + constraint count]
 ```
 
 ## Rules

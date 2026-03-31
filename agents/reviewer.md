@@ -82,4 +82,12 @@ HIGH: [count]
 MEDIUM: [count] (non-blocking)
 LOW: [count] (non-blocking)
 FINDINGS: [list]
+
+PASSPORT:
+  artifact: review-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: reviewer ([model])
+  based_on: [build artifact ID — NEVER plan or architect artifacts]
+  content_summary: [one line — verdict + finding counts]
 ```

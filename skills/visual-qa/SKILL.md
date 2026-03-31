@@ -7,6 +7,15 @@ description: Screenshot-based visual QA — capture pages, score against design 
 
 **Don't trust that UI changes look right. Screenshot them and verify.**
 
+## Playwright Verification (run before any visual QA work)
+
+```bash
+node -e "require('playwright')" 2>/dev/null && echo "PLAYWRIGHT: OK" || echo "PLAYWRIGHT: MISSING"
+ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+```
+
+If either is MISSING: `cd ~/.claude/tools && npm install playwright && npx playwright install chromium`. If install fails after 2 attempts → escalate to user. Visual QA without screenshots is not visual QA.
+
 ## When to Use
 
 - After /build when UI changes were made

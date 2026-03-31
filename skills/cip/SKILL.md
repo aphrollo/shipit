@@ -13,9 +13,11 @@ Automatically after /ship or /canary completes. Also after failed tasks (escalat
 
 ## The 3 Questions (30 seconds)
 
-1. **What slowed us down?** (phase that took too long, missing context, wrong classification, false positive in review)
-2. **What almost went wrong?** (bug caught by review that should have been caught by tests, scope creep discovered late, destructive command that /careful blocked)
-3. **What should change?** (new /learn entry, skill update needed, classification rule missing, checklist item to add)
+Check `docs/.shipit-metrics.jsonl` for data to inform your answers (if it exists):
+
+1. **What slowed us down?** (phase that took too long, missing context, wrong classification, false positive in review) — Check agent durations and retry counts in metrics.
+2. **What almost went wrong?** (bug caught by review that should have been caught by tests, scope creep discovered late, destructive command that /careful blocked) — Check gate_failures and loop_detected flags.
+3. **What should change?** (new /learn entry, skill update needed, classification rule missing, checklist item to add) — Check per-agent success rates and plan cache hit rate.
 
 ## Actions
 

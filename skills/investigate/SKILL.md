@@ -38,6 +38,17 @@ If you can't fill ROOT CAUSE and EVIDENCE, you haven't finished investigating.
 
 Abbreviated: REPRODUCE + ROOT CAUSE only. Skip TRACE/HYPOTHESIZE/VERIFY when the cause is obvious from the stack trace. Still requires the mandatory output block. Target: < 2 minutes.
 
+## Failure Paths
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| Cannot reproduce bug | Steps don't trigger error locally | Medium | Check environment differences (versions, config, data). Ask user for exact reproduction steps. |
+| Root cause unclear after 3 hypotheses | 3 VERIFY steps all disprove hypothesis | High | STOP. Escalate: "Cannot isolate root cause after 3 hypotheses. Need more context or a different perspective." |
+| Bug is in dependency, not our code | Trace leads outside project boundary | Medium | Document which dependency and version. Check for known issues/CVEs. Evaluate: patch, workaround, or upgrade. |
+| Multiple root causes | Fix one issue reveals another | High | Document all root causes. Return to /plan with full list. Fix in priority order. |
+| Flaky/intermittent bug | Reproduces sometimes but not consistently | High | Add logging/instrumentation to capture state on next occurrence. Check for race conditions, timing, shared state. |
+| Stack trace points to wrong location | Error originates upstream of reported location | Medium | Trace data flow backward from error. The symptom is not the cause. |
+
 ## Routing After
 
 - Simple implementation fix → /plan → /build

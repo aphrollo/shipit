@@ -26,16 +26,16 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 
 | Task Type | Route |
 |-----------|-------|
-| **New feature** | REFRAME → DESIGN (if UI) → PLAN → BUILD → QA (if UI) → REVIEW → CSO (if auth/input/data) → BENCHMARK (if frontend) → SHIP → CANARY |
+| **New feature** | REFRAME → DESIGN-REVIEW (if UI) → PLAN → BUILD → DESLOP (auto) → QA (if UI) → REVIEW → CSO (if auth/input/data) → BENCHMARK (if frontend) → SHIP → CANARY |
 | **Feature change** | Same as new feature |
-| **Bug / error** | INVESTIGATE → PLAN → BUILD → QA (if UI) → REVIEW → SHIP → CANARY |
-| **Hotfix (prod down)** | INVESTIGATE (fast) → BUILD → REVIEW (1 agent) → SHIP → CANARY |
-| **Refactor** | PLAN → BUILD → REVIEW → SHIP |
-| **Migration / deps** | PLAN → BUILD → REVIEW → CSO → SHIP |
+| **Bug / error** | INVESTIGATE → PLAN → BUILD → DESLOP (auto) → QA (if UI) → REVIEW → SHIP → CANARY |
+| **Hotfix (prod down)** | INVESTIGATE (fast) → BUILD → REVIEW (1 agent) → SHIP → CANARY. **Skip:** DESLOP, BENCHMARK, CSO. Speed over thoroughness. |
+| **Refactor** | PLAN → BUILD → DESLOP (auto) → REVIEW → SHIP |
+| **Migration / deps** | PLAN → BUILD → DESLOP (auto) → REVIEW → CSO → SHIP |
 | **Config/infra** | PLAN → BUILD → REVIEW → SHIP |
-| **Trivial fix** | BUILD → REVIEW → SHIP |
+| **Trivial fix** | BUILD → DESLOP (auto) → REVIEW → SHIP |
 | **Docs only** | BUILD (no TDD) → REVIEW → SHIP |
-| **Performance** | INVESTIGATE → PLAN → BUILD → BENCHMARK → REVIEW → SHIP |
+| **Performance** | INVESTIGATE → PLAN → BUILD → DESLOP (auto) → BENCHMARK → REVIEW → SHIP |
 | **Spike** | BUILD → done (no SHIP) |
 
 **Rules:**
@@ -55,9 +55,10 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 | /design-review | 7-state UI audit | → /plan |
 | /investigate | Root cause debugging | → /plan (or /reframe if design flaw) |
 | /plan | Files, tests, risks | → /build |
-| /build | TDD: RED → GREEN → REFACTOR | → /qa (if UI) or /review |
+| /build | TDD: RED → GREEN → REFACTOR | → /deslop (auto) → /qa (if UI) or /review |
+| /deslop | AI code cleanup (automatic, --auto mode) | → /qa (if UI) or /review |
 | /qa | Browser testing (Playwright) | → /review |
-| /review | Parallel Sonnet subagent audit | → /cso (if applicable) or /benchmark (if frontend) or /ship |
+| /review | Parallel Sonnet subagent audit + /receiving-review for findings | → /cso (if applicable) or /benchmark (if frontend) or /ship |
 | /cso | OWASP + STRIDE security audit | → /benchmark or /ship |
 | /benchmark | Performance regression detection | → /ship |
 | /ship | Pre-flight, deploy, verify | → /canary (if deployed) |

@@ -7,12 +7,18 @@ description: Clean up AI-generated code slop — remove dead code, redundant com
 
 **AI-generated code has predictable failure modes. This skill finds and fixes them.**
 
+## Pipeline Position
+
+**Automatic:** Runs after /build and before /review in `--auto` mode. The orchestrator invokes this automatically — no manual trigger needed. This ensures the reviewer sees clean code, not raw AI output.
+
+**Manual:** Can also be invoked standalone at any time.
+
 ## When to Use
 
-- After /build when the code feels over-engineered
-- When reviewing AI-written code that's technically correct but bloated
-- User says "deslop", "clean this up", "simplify", "too much code"
-- As part of /review when the reviewer flags unnecessary complexity
+- **Automatic (in pipeline):** After every /build, before /review. Runs in `--auto` mode (no approval needed).
+- **Manual:** When reviewing AI-written code that's technically correct but bloated
+- **Manual:** User says "deslop", "clean this up", "simplify", "too much code"
+- **Manual:** As part of /review when the reviewer flags unnecessary complexity
 
 ## The 10 Code Slop Patterns
 

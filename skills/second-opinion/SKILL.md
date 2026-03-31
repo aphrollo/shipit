@@ -53,6 +53,13 @@ For each finding, state your confidence: 1-10
 - If both models agree on a CRITICAL finding, treat it as confirmed — no tiebreaker needed
 - If models contradict on severity, escalate to user with both arguments
 
-## Integration with /review
+## Integration with /review (automatic offer)
 
-After `/review` completes, if any CRITICAL/HIGH findings exist AND the builder disputes them, offer `/second-opinion` as an alternative to the tiebreaker protocol. The second opinion provides a completely independent review rather than arbitrating a specific finding.
+After `/review` completes, `/second-opinion` is **automatically offered** (not auto-invoked) when:
+1. Any CRITICAL/HIGH findings exist AND the builder disputes them
+2. The tiebreaker protocol returns an inconclusive ruling
+3. Both models (auditor + adversarial QA) disagree on severity of the same finding
+
+The second opinion provides a completely independent review rather than arbitrating a specific finding.
+
+**Hard gate:** If both the original reviewer AND the second-opinion model agree on a CRITICAL finding, it is **confirmed with no appeal**. The builder must fix it.

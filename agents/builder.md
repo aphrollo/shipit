@@ -63,6 +63,14 @@ BUILD RESULT: PASS | FAIL
 TESTS: [pass count]/[total] passing
 FILES CHANGED: [list]
 NOTES: [anything the reviewer should know]
+
+PASSPORT:
+  artifact: build-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: builder ([model])
+  based_on: [plan artifact ID from orchestrator prompt]
+  content_summary: [one line — what was built and test results]
 ```
 
 If FAIL, explain what's blocking and what you tried.

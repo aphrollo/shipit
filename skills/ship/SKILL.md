@@ -28,10 +28,19 @@ Dev server for testing. Production only on explicit user approval.
 ## Post-Ship Automation
 
 After pre-flight checks pass and code is ready:
-1. **Auto-suggest `/deploy`** if a deploy platform is detected in the project
-2. **Auto-invoke `/document-release`** to audit documentation for staleness
-3. **Auto-invoke `/cip`** for continuous improvement (already mandatory)
+1. **Suggest `/deploy`** if a deploy platform is detected in the project (requires user approval — never auto-deploy)
+2. **Auto-run `/document-release`** to audit documentation for staleness (no approval needed — docs audit is non-destructive)
 
-This chain ensures: ship → deploy → document → improve.
+**Note:** `/cip` is invoked by the orchestrator after the full workflow completes — NOT here. Ship does not invoke CIP. This prevents double-invocation.
 
-## Next → /canary (if deployed to production) or /cip
+## Failure Paths
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| Tests fail on pre-flight | Test runner output | High | Return to /build. Do NOT ship with failing tests. |
+| Accidentally staged secrets | .env, credentials, API keys in git status | Critical | Unstage immediately. If already committed, rewrite history. Alert user. |
+| Lint fails on pre-flight | Lint tool output | Medium | Fix lint issues. Re-run pre-flight. |
+| Build fails | Compile/bundle errors | High | Return to /build. Investigate build failure. |
+| Health check fails after deploy | Non-200 response | High | Offer rollback. Check logs. Do NOT proceed to canary. |
+
+## Next → /canary (if deployed to production). CIP is handled by orchestrator.

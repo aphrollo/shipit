@@ -8,6 +8,11 @@ Multi-agent development workflow for [Claude Code](https://claude.ai/code). Six 
 User request
  ⎿ Router (10s) — classifies into 11 task types
     ⎿ Orchestrator — dispatches agents, checks gates, enforces sequence
+       │
+       │  [Step 0.5] Check for checkpoint — resume crashed workflow?
+       │  [Step 1]   Classify task type
+       │  [Step 2]   Dispatch agents with typed handoff schemas
+       │
        ├─ Researcher (optional)
        │  ⎿ "what do we need to know?" — codebase exploration, dependency analysis
        ├─ Architect
@@ -16,15 +21,23 @@ User request
        │  ⎿ design system → 7-state audit → slop detection — constrains UI before code
        ├─ Builder
        │  ⎿ RED → GREEN → REFACTOR — the only agent that edits files
+       ├─ Deslop (automatic)
+       │  ⎿ AI code cleanup — removes slop before review sees it
        ├─ Reviewer (cold)
        │  ⎿ receives only the diff — never architect reasoning or builder notes
        ├─ Deployer
        │  ⎿ pre-flight → deploy → canary soak — ships and watches
-       └─ CIP
-          ⎿ what slowed us down? what almost went wrong? what should change?
+       │
+       │  [Step 3]   Gate check: passport → schema → pass/fail → staleness → checkpoint
+       │  [Step 4]   Report with provenance chain
+       │  [Step 4.5] Collect workflow metrics
+       │  [Step 4.7] Update plan cache
+       │  [Step 5]   CIP — what slowed us? what almost went wrong? what should change?
+       │
+       └─ Done
 ```
 
-The orchestrator dispatches agents sequentially, checking quality gates between each. Not every task hits every agent — the router selects the shortest safe path:
+The orchestrator dispatches agents sequentially, checking quality gates between each. Every handoff is validated against typed schemas, and every artifact carries a material passport for traceability. Not every task hits every agent — the router selects the shortest safe path:
 
 | Task type | Agent sequence |
 |-----------|---------------|
@@ -68,13 +81,15 @@ Every agent transition has a gate. Pass or loop back.
 
 **3 consecutive failures at any gate → STOP.** Escalate to user. No infinite loops.
 
+**Loop detection** catches stuck agents faster — if two consecutive retries produce identical fingerprints (same error, same files), it changes the approach before counting against the circuit breaker. Three identical fingerprints = immediate stop.
+
 ### Tiebreaker protocol
 
 When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss it. A neutral Sonnet subagent arbitrates — sees the finding and the code, rules UPHOLD or DISMISS. Uncertainty defaults to UPHOLD.
 
 ## What's included
 
-**32 skills** across the full lifecycle:
+**32 skills** + **6 shared infrastructure modules** across the full lifecycle:
 
 | Phase | Skills | Purpose |
 |-------|--------|---------|
@@ -101,6 +116,29 @@ When the reviewer flags a CRITICAL/HIGH finding, the builder can't self-dismiss 
 | Hook | What it does |
 |------|-------------|
 | `/report` | Sends small progress updates to Telegram at each phase transition. Uses haiku model for minimal cost. Silent when no Telegram channel is active. |
+
+## Pipeline infrastructure
+
+**6 shared modules** govern how agents communicate, recover, and improve:
+
+| Module | File | What it does |
+|--------|------|-------------|
+| Handoff schemas | `shared/handoff_schemas.md` | 7 typed data contracts (RESEARCH, PLAN, INVESTIGATE, DESIGN, BUILD, REVIEW, DEPLOY). Missing required fields → HANDOFF_INCOMPLETE → blocks pipeline. |
+| Material passports | `shared/material_passports.md` | Every artifact carries provenance (who created it, when, from what, expiry). Enables staleness detection and post-incident traceability. |
+| Checkpointing | `shared/checkpointing.md` | Saves workflow state after each agent passes. Resume from last checkpoint on crash. Validates passport expiry on resume. |
+| Plan cache | `shared/plan_cache.md` | Extracts plan templates from successful workflows. Architect adapts cached templates instead of planning from scratch. 50% cost reduction on recurring task types. |
+| Loop detection | `shared/loop_detection.md` | Fingerprints agent retries. Identical failures don't waste circuit breaker budget — changes approach first. Three identical fingerprints = immediate stop. |
+| Workflow metrics | `shared/workflow_metrics.md` | JSONL log of every workflow: result, duration, per-agent stats, retries, cache hits. Auto-flags degradation every 10 workflows. Powers /cip and /retro. |
+
+### Provenance chain
+
+Every workflow report includes a full artifact chain:
+
+```
+research-2026-03-31-auth v1 → plan-2026-03-31-auth v2 → build-2026-03-31-auth v1 → review-2026-03-31-auth v1 → deploy-2026-03-31-auth v1
+```
+
+When something breaks in production, follow the chain to find exactly which plan, review, and build led there.
 
 ## Anti-rationalization
 
@@ -138,7 +176,8 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) CLI, desktop app, or IDE extension
-- For `/qa` and `/benchmark`: Node.js + Playwright (`npx playwright install chromium`)
+- For `/qa`, `/benchmark`, `/visual-qa`: Node.js + Playwright (`npx playwright install chromium`) — auto-verified before use
+- For workflow metrics analysis (`/retro`): `jq` (optional, for aggregate queries)
 
 ## How shipit compares
 
@@ -177,6 +216,12 @@ cp ~/.claude/shipit/hooks/hooks.json ~/.claude/hooks/hooks.json
 | Requirements clarification | `/interview` Socratic questioning + ambiguity scoring | None | `/office-hours` YC-style forcing questions |
 | AI code slop cleanup | `/deslop` — 10 code anti-patterns, scan + fix | None | `/ai-slop-cleaner` |
 | Visual screenshot QA | `/visual-qa` — screenshot capture + scoring at 3 breakpoints | None | None |
+| Typed handoff schemas | 7 schemas with validation + HANDOFF_INCOMPLETE | None | None |
+| Material passports | Artifact provenance, expiry, traceability chain | None | None |
+| Checkpointing | Resume from last agent on crash | None | None |
+| Plan caching | Template reuse for recurring task types | None | None |
+| Loop detection | Fingerprint-based stuck agent detection | None | None |
+| Workflow metrics | JSONL log with auto-degradation alerts | None | None |
 | Session bootstrap | `hooks.json` auto-loads router | `hooks.json` auto-loads meta-skill | None |
 
 ## Philosophy

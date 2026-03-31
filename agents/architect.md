@@ -73,3 +73,19 @@ Also check: keyboard nav, no layout shift, contrast >= WCAG AA, touch targets >=
 - One hypothesis at a time. No shotgunning.
 - 3 failed hypotheses → STOP. Say "Architecture is wrong. Escalate."
 - If investigation reveals a design flaw → recommend REFRAME, not a patch.
+
+## Material Passport
+
+Append a PASSPORT block to every output:
+
+```
+PASSPORT:
+  artifact: [investigate|plan|reframe|design-review]-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: architect ([model])
+  based_on: [list of parent artifact IDs from orchestrator prompt]
+  content_summary: [one line — what was decided/found]
+```
+
+Increment version if you revise a previous plan or investigation.

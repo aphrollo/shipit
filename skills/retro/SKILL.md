@@ -34,9 +34,34 @@ git log --since="1 week ago" --format="%an" | sort | uniq -c | sort -rn
 git diff --stat $(git log --since="1 week ago" --reverse --format="%H" | head -1)^..HEAD
 ```
 
+### 1.5. Workflow Metrics (if available)
+
+If `docs/.shipit-metrics.jsonl` exists, analyze it for the period:
+
+```bash
+# Count workflows and results
+cat docs/.shipit-metrics.jsonl | jq -r '.result' | sort | uniq -c
+
+# Average duration
+cat docs/.shipit-metrics.jsonl | jq '.duration_minutes' | awk '{sum+=$1; n++} END {print sum/n " avg minutes"}'
+
+# Most common failure agent
+cat docs/.shipit-metrics.jsonl | jq -r '.gate_failures | keys[]' 2>/dev/null | sort | uniq -c | sort -rn
+
+# Plan cache hit rate
+cat docs/.shipit-metrics.jsonl | jq -r '.plan_cache_hit' | sort | uniq -c
+```
+
+Key metrics to surface:
+- **End-to-end success rate** over the period
+- **Which agent fails most** and why
+- **Plan cache effectiveness** (hit rate, success rate of cached plans)
+- **Average retries per workflow** (trending up = prompt quality degrading)
+- **Loop detection triggers** (if any, what caused them)
+
 ### 2. Analyze Patterns
 
-From the commit data, identify:
+From the commit data and workflow metrics, identify:
 - **Shipping velocity**: How many features/fixes shipped?
 - **Hotspot files**: Which files changed most? (potential refactor candidates)
 - **Commit patterns**: Are commits atomic and well-described, or large and vague?

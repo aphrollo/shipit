@@ -42,6 +42,14 @@ RISKS/CONCERNS:
   - [anything the architect should worry about]
 SOURCES:
   - [where this information came from]
+
+PASSPORT:
+  artifact: research-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: researcher ([model])
+  based_on: [user-request]
+  content_summary: [one line — what was found]
 ```
 
 ## Rules

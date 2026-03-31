@@ -67,4 +67,12 @@ PRE-FLIGHT: PASS | FAIL
 DEPLOY: SKIPPED | SUCCESS | FAILED
 CANARY: HEALTHY | DEGRADED | ROLLBACK | SKIPPED
 NOTES: [any issues or warnings]
+
+PASSPORT:
+  artifact: deploy-[YYYY-MM-DD]-[topic]
+  version: 1
+  created_at: [ISO 8601]
+  created_by: deployer ([model])
+  based_on: [review artifact ID]
+  content_summary: [one line — deploy target + status + canary result]
 ```

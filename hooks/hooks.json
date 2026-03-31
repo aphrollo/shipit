@@ -11,6 +11,18 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'SHIPIT ROUTER: If this prompt requests code/config/infra changes (build, fix, change, add, remove, refactor, create, update, implement, debug, deploy), you MUST invoke the Skill tool with skill: \"shipit:router\" BEFORE generating any code or response. Classify the task, then dispatch via /orchestrate. Do NOT skip this step. Do NOT respond inline. If the prompt is a question, greeting, or non-work request, respond normally.'",
+            "async": false
+          }
+        ]
+      }
     ]
   }
 }

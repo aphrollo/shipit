@@ -5,6 +5,8 @@ description: When building or changing UI elements — audit all 7 interaction s
 
 # Design Review
 
+**Lightweight audit gate — NOT full design system creation. For full design system, use /design.**
+
 **Gate: All 7 states accounted for.**
 
 ## 7-State Audit
@@ -67,5 +69,9 @@ Score the design against these 10 blacklisted anti-patterns commonly produced by
 - 7+ violations = F (redesign needed)
 
 **Report AI Slop Score alongside the design review.** If score is C or below, recommend specific alternatives for each violation.
+
+## DESIGN.md Location
+
+Always `docs/DESIGN.md`. If auditing against an existing design system, look there first. If creating a new one, write to `docs/DESIGN.md`.
 
 ## Next → /plan

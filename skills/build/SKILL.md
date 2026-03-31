@@ -34,8 +34,23 @@ Write test + implementation in same step when behavior is obvious AND implementa
 
 If BUILD discovers changes not covered by PLAN (new DB schema, new API endpoint, different module) → **STOP**. Return to /plan, update scope, get approval, resume.
 
+## Circuit Breaker
+
+3 build cycles without tests passing → **STOP**. Escalate: "Build has failed 3 times. The approach or architecture may need rethinking." Return to /plan.
+
 ## File Size Discipline
 
 Source files should stay under 500 LOC of logic. If a file grows past this, split it before proceeding to /review.
 
-## Next → /qa (if UI/frontend changed) or /review
+## Failure Paths
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| Tests fail after GREEN phase | Test runner output shows failures | Medium | Re-read failing test, check if implementation is incomplete. Fix and re-run. |
+| Lint/vet errors after REFACTOR | Lint tool output | Low | Fix lint issues without changing behavior. Re-run tests. |
+| Scope creep discovered | New DB schema, API endpoint, or module needed | High | STOP. Return to /plan. Do NOT expand scope inline. |
+| Flaky test (passes sometimes) | Intermittent pass/fail on same code | High | Isolate flaky test, fix root cause (race condition, time dependency, shared state). Never ignore. |
+| Build tool crash / environment issue | npm/go/cargo errors unrelated to code | Medium | Fix environment (install deps, clear cache). If persists after 2 attempts, escalate. |
+| Implementation contradicts plan | Code requires different approach than planned | Medium | STOP. Return to /plan with findings. Update plan before continuing. |
+
+## Next → /deslop (--auto mode) → /qa (if UI/frontend changed) or /review

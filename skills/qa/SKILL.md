@@ -9,6 +9,21 @@ description: When frontend changes are complete — run real browser testing via
 
 Playwright is installed at `~/.claude/tools/node_modules/playwright`. Chromium at `~/.cache/ms-playwright/`.
 
+## Playwright Verification (run before any QA work)
+
+```bash
+# Check Playwright is installed and Chromium is available
+node -e "require('playwright')" 2>/dev/null && echo "PLAYWRIGHT: OK" || echo "PLAYWRIGHT: MISSING"
+ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+```
+
+If either is MISSING, install before proceeding:
+```bash
+cd ~/.claude/tools && npm install playwright && npx playwright install chromium
+```
+
+If install fails after 2 attempts → fall back to manual testing checklist. Do NOT skip QA.
+
 ## When to Run
 
 - After /build for any frontend change

@@ -11,7 +11,14 @@ description: When /build completes and tests pass — spawn parallel Sonnet suba
 
 Send BOTH subagents: full git diff, test files for changed modules, upstream callers (files importing changed code), AND downstream callees (files called by changed code). Both directions of call graph. When in doubt, send more.
 
-**Large diffs (> 500 lines):** Split by module/package. One subagent pair per chunk. ANY chunk FAIL = overall FAIL.
+**Large diffs (> 500 lines):** Auto-split before review:
+1. Run `git diff --stat` to identify changed files and line counts
+2. Group files by module/package (same directory = same chunk)
+3. If any single file > 500 lines changed, that file is its own chunk
+4. Spawn one subagent pair per chunk (parallel when independent)
+5. ANY chunk FAIL = overall FAIL
+
+The orchestrator handles splitting. If running inline, the reviewer must split manually using the rules above.
 
 ### Subagent skepticism
 
@@ -98,10 +105,22 @@ REASON: [one sentence]
 ## After Review
 
 - Both PASS → /ship. Surface MEDIUM/LOW to user.
-- Either FAIL → fix CRITICAL/HIGH. Re-review with only new fixes.
+- Either FAIL → builder uses `/receiving-review` protocol to evaluate findings (verify each claim against codebase, push back on false positives, fix confirmed issues). Re-review with only new fixes.
+- CRITICAL/HIGH disputed by builder → offer `/second-opinion` (cross-model blind review) as alternative to tiebreaker. If both models agree on CRITICAL, finding is confirmed — no appeal.
 - 3 review cycles without PASS → STOP. Escalate: "Review failed 3 times. Different approach needed." Return to /plan.
 - Malformed response → FAIL. Re-run subagent.
 - Spawn fails → manual review using both checklists. Do NOT skip.
+
+## Failure Paths
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| Subagent returns malformed output | Missing VERDICT line or unparseable | Medium | Re-run the specific subagent. If fails twice, manual review. |
+| Subagent spawn fails | Agent tool returns error | Medium | Manual review using both checklists. Never skip review. |
+| Tiebreaker deadlock | Tiebreaker agent returns inconclusive | Medium | Offer /second-opinion. If still deadlocked, escalate to user. |
+| Large diff overwhelms reviewer | Findings are vague or miss obvious issues | High | Split into smaller chunks. Re-review per chunk. |
+| False positive flood | >5 MEDIUM/LOW findings that are all incorrect | Low | Check reviewer prompt quality. May need context tuning. |
+| Builder disputes all findings | Every finding challenged | High | Mandatory /second-opinion. If second model agrees with reviewer, findings stand. |
 
 ## Hotfix Mode
 

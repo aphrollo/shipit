@@ -20,7 +20,7 @@ Same classification as /router:
 | **Config/infra** | architect(plan) → builder → reviewer → deployer |
 | **Bug / error** | architect(investigate+plan) → builder → reviewer |
 | **Bug (complex/unfamiliar code)** | researcher → architect(investigate+plan) → builder → reviewer |
-| **Hotfix** | architect(investigate-fast) → builder → reviewer(1-pass) → deployer |
+| **Hotfix** | architect(investigate-fast) → builder → reviewer(1-pass) → deployer. **Signal:** Pass `mode: hotfix` to architect. Architect runs REPRODUCE + ROOT CAUSE only (skip TRACE/HYPOTHESIZE/VERIFY). Verbal plan (30s, no docs). **Skip:** /deslop, /benchmark, /cso, /qa. Speed over thoroughness when prod is down. |
 | **New feature** | architect(reframe+plan) → builder → reviewer → deployer |
 | **New feature (with UI)** | architect(reframe+plan) → designer → builder → reviewer → deployer |
 | **New feature (unfamiliar area)** | researcher → architect(reframe+plan) → builder → reviewer → deployer |
@@ -31,7 +31,51 @@ Same classification as /router:
 
 **Fast path:** Trivial and docs skip architect and deployer entirely — 2 agents, not 4.
 
+**Deslop integration:** After builder completes and before reviewer, run `/deslop --auto` on the builder's changes. This is automatic and non-blocking — it cleans AI code patterns before review sees them. If deslop finds score > 15/30, flag to user but don't block.
+
 **Research rule:** When ANY phase hits an unknown — unfamiliar API, unclear behavior, "how does X work?" — spawn researcher instead of exploring inline. Even on trivial tasks. Inline research pollutes the orchestrator's context. The researcher's context is disposable.
+
+## Step 0.5: Checkpoint Resume Check
+
+Before starting a new workflow, check for an existing checkpoint (see `shared/checkpointing.md`):
+
+1. Read `docs/.shipit-checkpoint.json` if it exists
+2. If checkpoint matches current task → offer resume to user
+3. If checkpoint is stale (>4h) → recommend fresh start
+4. If no checkpoint → proceed normally
+
+On resume: validate all passport expiry times, re-run expired phases, resume from pending_phase.
+
+## Handoff Schemas & Material Passports
+
+Every agent-to-agent handoff is governed by typed schemas defined in `shared/handoff_schemas.md`. Every artifact carries a material passport defined in `shared/material_passports.md`.
+
+**Schemas enforce completeness** — missing required fields trigger HANDOFF_INCOMPLETE, blocking the pipeline until the producing agent fills them.
+
+**Passports enforce freshness** — expired artifacts must be re-created before downstream agents can use them.
+
+The orchestrator validates both at every gate check (Step 3).
+
+## Plan Cache
+
+Before spawning the architect for a plan phase, check the plan cache (see `shared/plan_cache.md`):
+
+1. Read `docs/.shipit-plan-cache.json` if it exists
+2. Match user request against cached task_patterns
+3. If match found (success_rate >= 80% or new template) → include template in architect's context: "PLAN TEMPLATE (adapt, don't copy): [template]"
+4. Architect adapts the template to the specific task (this is adaptation, not blind reuse)
+5. After workflow completes → update cache (capture new template or track success/failure of existing)
+
+## Loop Detection
+
+The orchestrator tracks agent retries using fingerprinting and progress detection (see `shared/loop_detection.md`):
+
+- After each agent failure, compute fingerprint: `hash(agent + status + error_type + files)`
+- **Same fingerprint twice** → agent is stuck. Change approach (more context, model override up, narrower scope) before retrying. Do NOT count as a real retry against circuit breaker.
+- **Same fingerprint three times** → STOP immediately. Escalate. Don't waste the circuit breaker budget.
+- **No progress between retries** (same test count, same findings, same files) → stuck. Change approach.
+
+This works WITH circuit breakers: breakers catch 3 real failures, loop detection catches identical failures faster.
 
 ## Step 2: Dispatch
 
@@ -85,6 +129,7 @@ Agent tool call:
 
 **Reviewer receives:**
 - The git diff of what builder changed (`git diff` output)
+- `git diff --stat` output (for large diff auto-splitting — if >500 lines, split by module before spawning review subagents)
 - Test files for changed modules
 - Upstream callers and downstream callees of changed code
 - Whether to include CSO (security audit)
@@ -116,23 +161,67 @@ Override up: If a haiku agent fails a gate, retry with sonnet. If sonnet fails, 
 When agents are independent, spawn them in parallel:
 - Architect phases are sequential (investigate before plan)
 - Builder must wait for architect's plan
-- Reviewer must wait for builder's diff
+- **Deslop** runs after builder, before reviewer (automatic, inline, non-blocking)
+- Reviewer must wait for builder's diff (post-deslop)
 - Deployer must wait for reviewer's PASS
-- BUT: if reviewer needs CSO, spawn the security check as a parallel reviewer task
+- CSO runs **sequentially after reviewer PASS**, not in parallel (security audit needs clean code, not in-flight changes)
+
+### Staleness detection
+
+Before each agent runs, check if its inputs are stale:
+- **Plan staleness**: If architect's plan is >2 hours old AND git log shows new commits since plan was created → re-run architect with updated context
+- **Research staleness**: If researcher's findings are >4 hours old → re-run researcher
+- **Review staleness**: If reviewer's PASS is >1 hour old AND builder made additional changes since review → re-review
+- **Baseline staleness**: If benchmark baseline is >24 hours old → recapture before comparing
+
+**Implementation:** Timestamps are tracked by the orchestrator in-memory during a session. Each agent's completion time is recorded when its gate check passes. Compare against `git log --oneline -1 --format=%ct` (unix timestamp of latest commit) to detect code changes since last phase. No external file needed — staleness is session-scoped.
+
+When in doubt, re-run — fresh data is cheap, stale bugs are expensive.
 
 ## Step 3: Gate checks (inline — no agent spawn)
 
-After each agent returns, check the gate:
+After each agent returns, the orchestrator runs THREE checks in order:
+
+### 3a. Passport validation
+- Parse the PASSPORT block from agent output
+- Verify required fields: artifact, version, created_at, created_by, based_on, content_summary
+- Check that `based_on` references match artifacts the orchestrator has in session
+- Set `expires_at` based on artifact type (see `shared/material_passports.md`)
+- Set status to VERIFIED if all checks pass
+- Missing PASSPORT block → warn agent but don't block (graceful degradation)
+
+### 3b. Schema validation
+- Validate agent output against the handoff schema for its type (see `shared/handoff_schemas.md`)
+- Check all required fields present and non-empty
+- Run type checks (enums match, lists are lists, etc.)
+- Run cross-reference checks (e.g., builder's files_changed subset of plan's files_to_change)
+- Run contradiction checks (e.g., PASS + CRITICAL findings = auto-correct to FAIL)
+- **HANDOFF_INCOMPLETE** → return to agent with: "HANDOFF_INCOMPLETE: missing [field1, field2]. Re-run and include these." Max 2 retries.
+
+### 3c. Gate check
+- Evaluate pass/fail condition for the agent type:
 
 | Agent | PASS condition | On FAIL |
 |-------|---------------|---------|
-| researcher | Has structured RESEARCH output with KEY FINDINGS and RELEVANT FILES | Retry with narrower scope, or skip and let architect explore inline |
-| architect | Has structured output (ROOT CAUSE block, or PLAN with files+tests) | Ask user to clarify requirements |
-| builder | All tests pass, BUILD RESULT: PASS | Feed errors back to builder, retry (max 3) |
-| reviewer | REVIEW RESULT: PASS, no CRITICAL/HIGH | Feed findings to builder as fix instructions, re-review after fix (max 3 cycles) |
-| deployer | DEPLOY RESULT: PASS, CANARY: HEALTHY | Alert user immediately. Do NOT auto-rollback without approval. |
+| researcher | RESEARCH_HANDOFF valid: key_findings + relevant_files non-empty | Retry with narrower scope, or skip and let architect explore inline |
+| architect | PLAN_HANDOFF or INVESTIGATE_HANDOFF valid: all required fields present | Ask user to clarify requirements, retry (max 2). If still fails, STOP. |
+| designer | DESIGN_HANDOFF valid: all 7 states filled, constraints non-empty | Re-run with specific missing states listed. Max 2 retries. |
+| builder | BUILD_HANDOFF valid: result=PASS, tests_passed=tests_total | Feed errors back to builder, retry (max 3) |
+| reviewer | REVIEW_HANDOFF valid: result=PASS, critical_count=0, high_count=0 | Feed findings to builder via /receiving-review, re-review after fix (max 3 cycles) |
+| deployer | DEPLOY_HANDOFF valid: result=PASS, preflight=PASS | Alert user immediately. Do NOT auto-rollback without approval. |
+
+### 3d. Staleness check on next agent's inputs
+- Before spawning the NEXT agent, check `expires_at` on all parent artifacts it depends on
+- If any parent is expired → re-run the expired agent first
+- Pass artifact IDs + content_summaries to the next agent in its prompt
+
+### 3e. Checkpoint save
+- After gate check PASSES, save checkpoint to `docs/.shipit-checkpoint.json` (see `shared/checkpointing.md`)
+- Record: completed phase, artifact ID, passport, output summary
+- This enables resume if the orchestrator crashes before the next agent completes
 
 **3 failures at any gate → STOP. Report to user: "[phase] failed 3 times. Different approach needed."**
+**But first**: check loop detection — if fingerprints are identical, change approach before counting as a real failure.
 
 ## Step 3.5: /report hook (conditional — Telegram only)
 
@@ -163,11 +252,45 @@ RESULT: PASS | FAIL
 CHANGES: [files changed]
 DEPLOYED: yes (dev/prod) | no
 NOTES: [anything notable — reviewer findings fixed, performance metrics, etc.]
+
+PROVENANCE CHAIN:
+  [artifact-id v1] → [artifact-id v1] → [artifact-id v1] → ...
+  (full chain from first agent to last, with versions)
 ```
 
-## Step 5: CIP (mandatory — runs automatically, never skip)
+The provenance chain is constructed from material passports collected during the workflow. It enables post-incident traceability — if something breaks in prod, follow the chain to find which plan, build, and review led to the deploy.
+
+## Step 4.5: Workflow Metrics
+
+Append a metrics record to `docs/.shipit-metrics.jsonl` (see `shared/workflow_metrics.md`):
+- Workflow result, classification, duration, agents used
+- Per-agent results, retry counts, models used, durations
+- Gate failures, loop detections, handoff incomplete counts
+- Plan cache hit/miss, checkpoint resume used
+
+Every 10th workflow, auto-analyze aggregates:
+- End-to-end success rate < 85% → flag degradation
+- Any agent retry rate > 30% → flag for prompt improvement
+- Mean time increased > 50% → flag slowdown
+
+Metrics make /cip and /retro data-driven instead of anecdotal.
+
+## Step 4.6: Checkpoint Cleanup
+
+- Workflow PASS → delete `docs/.shipit-checkpoint.json` (workflow completed successfully)
+- Workflow FAIL (escalated) → keep checkpoint (user may resume later)
+
+## Step 4.7: Plan Cache Update
+
+- Workflow PASS → capture plan template if new task pattern, or increment success count for existing template
+- Workflow FAIL at builder or later → increment failure count for matched template
+- Workflow FAIL at architect → flag template for review (may be wrong)
+
+## Step 5: CIP (mandatory — the ONLY place CIP runs, never skip)
 
 After EVERY workflow completion (PASS or FAIL), run /cip inline. Do NOT ask whether to run it. Do NOT skip it. This is the continuous improvement loop that makes the workflow better over time.
+
+**CIP runs HERE and ONLY here.** Individual skills (like /ship) do NOT invoke CIP — only the orchestrator does, once, at the end. This prevents double-invocation.
 
 Answer the 3 CIP questions:
 1. What slowed us down?
@@ -178,6 +301,21 @@ If a learning emerges → persist via /learn (with user confirmation).
 If classification was wrong → update /orchestrate dispatch table.
 If a gate was too loose/strict → update the gate check.
 If an agent prompt was missing something → update the agent template.
+
+## Failure Paths (orchestrator-level)
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| Agent spawn fails | Agent tool returns error | Medium | Retry once with same model. If still fails, retry with model override up. If opus fails, fall back to inline execution. |
+| Agent returns empty/garbage | No structured output, missing required sections | Medium | Re-spawn with clearer prompt. If fails twice, escalate to user. |
+| Gate fails 3 times at same phase | Counter reaches 3 for any phase | High | STOP entire workflow. Report which phase failed and why. Return to /plan or escalate. |
+| Stale inputs detected | Timestamp check fails (see staleness detection) | Medium | Re-run the upstream agent that produced stale data. |
+| Classification was wrong (discovered mid-workflow) | Builder or reviewer discovers task is more complex than classified | High | STOP. Reclassify. Restart from correct phase. Do NOT continue on wrong path. |
+| Context window approaching limit | Orchestrator at >70% context | Medium | Compact conversation. Summarize completed phases. Continue with fresh context. |
+| User interrupts mid-workflow | User sends new message during agent execution | Low | Complete current agent, then pause. Ask user if they want to continue or pivot. |
+| Researcher returns nothing useful | No KEY FINDINGS or all findings are irrelevant | Low | Skip researcher phase. Let architect explore inline. |
+| Builder scope creep | Builder discovers changes not in plan | High | STOP builder. Return to architect for re-plan. |
+| Deploy fails after review PASS | Health check fails post-deploy | Critical | Offer rollback immediately. Do NOT auto-rollback without user approval. |
 
 ## Adding a New Agent
 

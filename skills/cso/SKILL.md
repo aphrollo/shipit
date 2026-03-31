@@ -39,15 +39,34 @@ For each component touched by the change:
 
 ```
 SCOPE: [what was audited]
-OWASP FINDINGS: [list with severity]
-STRIDE FINDINGS: [list with severity]
-VERDICT: SECURE / NEEDS FIX (list specific issues)
+OWASP FINDINGS: [list with severity — CRITICAL/HIGH/MEDIUM/LOW]
+STRIDE FINDINGS: [list with severity — CRITICAL/HIGH/MEDIUM/LOW]
+VERDICT: PASS / FAIL
 ```
+
+## Gate (pass/fail conditions)
+
+- **PASS**: No CRITICAL or HIGH findings. MEDIUM/LOW are advisory (surface to user, don't block).
+- **FAIL**: Any CRITICAL or HIGH finding. Must be fixed before /ship.
+- **3 CSO cycles without PASS → STOP.** Escalate: "Security audit has failed 3 times. Architecture may need security-focused redesign."
+
+CRITICAL/HIGH findings in CSO are **non-overridable** — unlike code review, there is no tiebreaker for security. Fix or redesign.
 
 ## When to Skip
 
 - Pure refactors with no behavior change
 - Docs-only changes
 - Frontend-only styling changes with no data handling
+
+## Failure Paths
+
+| Scenario | Detection | Severity | Recovery |
+|----------|-----------|----------|----------|
+| CRITICAL injection vulnerability | Unparameterized query, command injection | Critical | STOP. Fix immediately. Re-audit after fix. |
+| Missing auth on endpoint | No access control check | Critical | Add auth middleware/check. Re-audit. |
+| Secrets in code/logs | Credentials in plaintext, API keys logged | Critical | Remove, rotate secrets, scrub git history if committed. |
+| Outdated dependency with CVE | Known vulnerability in dependency | High | Update dependency. If breaking change, return to /plan. |
+| Missing rate limiting | Sensitive operation without throttling | Medium | Add rate limiting. Advisory — doesn't block. |
+| Verbose error messages | Stack traces or internals exposed to user | Low | Sanitize error output. Advisory. |
 
 ## Next → /benchmark (if frontend) or /ship
