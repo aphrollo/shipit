@@ -54,7 +54,7 @@ Every agent-to-agent handoff is governed by typed schemas defined in `shared/han
 
 **Passports enforce freshness** — expired artifacts must be re-created before downstream agents can use them.
 
-The orchestrator validates both at every gate check (Step 3).
+The orchestrator validates both at every gate check (Step 4).
 
 ## Plan Cache
 

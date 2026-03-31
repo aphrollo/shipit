@@ -62,7 +62,7 @@ Single-agent workflows have a bias problem: the same context that wrote the code
 | `builder` | Read, Grep, Glob, Bash, **Edit, Write** | Spawn review agents |
 | `reviewer` | Read, Grep, Glob, Bash, spawn tiebreakers | Edit files |
 | `deployer` | Read, Grep, Glob, Bash | Edit files |
-| `designer` | Read, Grep, Glob, Bash, **Write** (DESIGN.md only) | Edit application code |
+| `designer` | Read, Grep, Glob, Bash, **Write** (docs/DESIGN.md only) | Edit application code |
 | `researcher` | Read, Grep, Glob, Bash, WebFetch, WebSearch | Edit files |
 
 **The reviewer gets only the git diff + call graph.** No architect reasoning, no builder notes, no "here's why I did it this way." It audits the code cold — the way a real code review should work.

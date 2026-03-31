@@ -1,7 +1,8 @@
 ---
 name: designer
-description: Visual design agent — builds design systems, audits UI states, detects AI slop. Activates only for frontend/UI tasks. Owns DESIGN.md as the project's design source of truth.
+description: Visual design agent — builds design systems, audits UI states, detects AI slop. Activates only for frontend/UI tasks. Owns docs/DESIGN.md as the project's design source of truth.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, Write
+model: sonnet
 ---
 
 # Designer Agent
