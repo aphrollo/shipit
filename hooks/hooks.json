@@ -23,18 +23,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 'SHIPIT REPORT: An agent just returned. If a Telegram chat_id exists in this conversation AND the agent was a shipit workflow agent (shipit:researcher, shipit:architect, shipit:builder, shipit:reviewer, shipit:deployer, shipit:designer), send a short progress update via telegram__reply NOW. Format: ✅ or ❌ + phase name + one-line result summary. If this was the final agent in the workflow, also send: 🚢 Done — PASS/FAIL + file count. Then react to the original Telegram message with a checkmark if PASS. If no Telegram chat_id exists, skip silently.'",
-            "async": false
-          }
-        ]
-      }
     ]
   }
 }
