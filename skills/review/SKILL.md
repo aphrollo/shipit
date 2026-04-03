@@ -31,6 +31,17 @@ The spec compliance reviewer MUST verify by reading actual code — not by trust
 
 **Rule: Do Not Trust the Report.** Verify by reading. Claims without code evidence = FAIL.
 
+### Red Flags — Reviewer Self-Check
+
+| You think... | Reality |
+|---|---|
+| "Code works, tests pass, that's enough" | Working != readable. Check naming. |
+| "I understand what `data` means here" | You have full context. Next reader won't. |
+| "Naming is subjective" | Builder rules are objective: verb+noun, no `data`/`result`/`temp`. |
+| "It's a small change, no need to nitpick" | Small changes accumulate. Apply same bar. |
+| "Tests cover it, so the code is fine" | Tests verify behavior, not maintainability. |
+| "Refactoring is out of scope for review" | READABILITY is a review dimension. Flag it. |
+
 ## Subagent 1: Code Auditor (Sonnet)
 
 ```
@@ -43,6 +54,7 @@ Review for:
 4. SECURITY: Unparameterized queries, credentials in logs, missing input validation
 5. PERFORMANCE: N+1 queries, unbounded allocations, expensive ops in loops
 6. CORRECTNESS: Off-by-one, overflow, nil/null dereference, wrong comparison
+7. READABILITY: Generic names (data/result/temp/val/info), functions missing verb+noun, booleans that don't read as questions, comments restating code, unnecessary abstractions (one caller = inline, unless wrapper enforces an invariant). READABILITY findings are always MEDIUM or LOW — never CRITICAL/HIGH.
 
 For each: SEVERITY (CRITICAL/HIGH/MEDIUM/LOW), FILE:LINE, PROBLEM, FIX.
 If uncertain, mark MEDIUM not CRITICAL. Surface MEDIUM/LOW as non-blocking.
