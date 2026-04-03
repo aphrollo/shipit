@@ -71,7 +71,8 @@ Review for:
 1. EDGE CASES: Untested inputs (empty, nil, max, negative, unicode, very long)
 2. STATE SEQUENCES: Order of operations causing bugs (create→delete→create, concurrent writes)
 3. MISSING TESTS: Compare impl diff against test diff — what lacks coverage?
-4. REGRESSION RISK: What existing behavior might break?
+4. BAD TESTS: Tests that pass but verify nothing — mocking without understanding, testing implementation not behavior, trivially passing stubs, incomplete mock structures.
+5. REGRESSION RISK: What existing behavior might break?
 
 For each: SEVERITY, SCENARIO, EXPECTED, ACTUAL.
 Focus on the category of code changed.
