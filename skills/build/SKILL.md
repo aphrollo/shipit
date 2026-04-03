@@ -30,6 +30,35 @@ description: When implementing code changes — enforce TDD (RED → GREEN → R
 
 Write test + implementation in same step when behavior is obvious AND implementation didn't previously exist.
 
+## Code Hygiene
+
+Self-documenting code is the goal. Comments are a last resort, not a default.
+
+### Naming
+
+- **Functions**: verb + domain noun. `parseInvoice`, `routeMessage`, `validateToken`. NOT `handleData`, `processItem`, `doWork`.
+- **Variables**: reveal what it holds. `retryCount`, `userEmail`, `pendingOrders`. NOT `data`, `result`, `temp`, `val`, `info`. (`item` is fine when iterating a well-named collection.)
+- **Booleans**: read as a question. `isExpired`, `hasPermission`, `shouldRetry`. NOT `flag`, `check`, `status`.
+- **Match the codebase**: Before naming anything, read existing names in the file/module. Mirror the project's conventions, not your defaults.
+
+### Comments — the 3 permitted uses
+
+1. **WHY** — explain a non-obvious business rule or workaround. `// Stripe requires idempotency key for retries`
+2. **TODO** — flag known incomplete work. `// TODO: handle pagination when > 100 results`
+3. **PUBLIC API** — document exported functions/types that others consume.
+
+Everything else is banned. No restating code. No section headers. No "Initialize variables" above variable declarations.
+
+### Abstraction gate
+
+- **One caller = inline (production code).** Do not extract a helper function until it has 2+ distinct call sites. Test helpers are exempt.
+- **One implementation = no interface.** Do not create an interface/trait/protocol until a second implementation exists.
+- **Thin wrappers = delete.** If a function only calls another function with the same or fewer args, inline it.
+
+### Self-check at REFACTOR
+
+Before leaving REFACTOR, scan your changes for: (1) any comment that restates code — delete it, (2) any variable named `data`/`result`/`info`/`temp`/`val` — rename it, (3) any production function with one caller — consider inlining.
+
 ## Scope Creep
 
 If BUILD discovers changes not covered by PLAN (new DB schema, new API endpoint, different module) → **STOP**. Return to /plan, update scope, get approval, resume.
