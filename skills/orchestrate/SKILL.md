@@ -42,7 +42,7 @@ Same classification as /router:
 
 **Fast path:** Trivial and docs skip architect and deployer entirely — 2 agents, not 4.
 
-**Deslop integration:** After builder completes and before reviewer, run `/deslop --auto` on the builder's changes. This is automatic and non-blocking — it cleans AI code patterns before review sees them. If deslop finds score > 15/30, flag to user but don't block.
+**Deslop integration:** After builder completes and before reviewer, run `/deslop --auto` on the builder's changes. This is automatic and non-blocking — it cleans AI code patterns before review sees them. If deslop finds score > 17/33, flag to user but don't block.
 
 **Research rule:** When ANY phase hits an unknown — unfamiliar API, unclear behavior, "how does X work?" — spawn researcher instead of exploring inline. Even on trivial tasks. Inline research pollutes the orchestrator's context. The researcher's context is disposable.
 

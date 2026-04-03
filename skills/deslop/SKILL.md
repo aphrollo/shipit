@@ -20,7 +20,7 @@ description: Clean up AI-generated code slop — remove dead code, redundant com
 - **Manual:** User says "deslop", "clean this up", "simplify", "too much code"
 - **Manual:** As part of /review when the reviewer flags unnecessary complexity
 
-## The 10 Code Slop Patterns
+## The 11 Code Slop Patterns
 
 | # | Pattern | What to look for |
 |---|---------|-----------------|
@@ -34,6 +34,7 @@ description: Clean up AI-generated code slop — remove dead code, redundant com
 | 8 | Type ceremony | Explicit types where inference works. Interface for every object literal. Type aliases that just rename primitives. |
 | 9 | Error message novels | Multi-paragraph error messages. Errors that explain the architecture. Stack traces in user-facing messages. |
 | 10 | Test scaffolding bloat | beforeEach/afterEach that could be inline setup. Shared fixtures for tests that don't share state. Helper functions used once. |
+| 11 | Generic naming | Variables named `data`/`result`/`temp`/`val`/`info`/`flag`/`check`/`status`. Functions named handleX/processX/doX without domain nouns (except framework-idiomatic handlers like handleClick/handleSubmit). Booleans that don't read as questions. Lower weight for `result` in test assertion code. Renaming is permitted under the no-add rule. |
 
 ## Process
 
@@ -47,7 +48,7 @@ Read the changed files and score each slop pattern (0 = none, 1 = minor, 2 = sig
 DESLOP SCAN
 
 FILES: [list]
-TOTAL SLOP SCORE: [sum] / 30
+TOTAL SLOP SCORE: [sum] / 33
 
 FINDINGS:
 - [pattern name]: [score] — [specific example with file:line]
