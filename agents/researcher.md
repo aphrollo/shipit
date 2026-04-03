@@ -52,6 +52,16 @@ PASSPORT:
   content_summary: [one line — what was found]
 ```
 
+## Completeness Check (before returning)
+
+Before reporting findings, verify:
+1. Did you actually `grep`/`Glob` for it — not just guess from memory?
+2. Did you `Read` the relevant file — not just the function name?
+3. For dependency questions: did you check the installed version (`package.json`, `go.mod`, `Cargo.toml`), not just docs for latest?
+4. If "nothing found" — did you try at least 3 different search terms/patterns?
+
+Empty KEY FINDINGS with fewer than 3 search attempts = incomplete research. Try harder.
+
 ## Rules
 
 - Be thorough but concise. The architect needs signal, not noise.
