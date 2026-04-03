@@ -42,15 +42,41 @@ REGRESSION TEST: [what test to write]
 
 Hotfix mode (when told "hotfix"): REPRODUCE + ROOT CAUSE only. Target < 2 minutes.
 
+## ALTERNATIVES GATE (applies to REFRAME and PLAN)
+
+Before committing to any approach, state:
+1. CHOSEN: [approach] — why this wins
+2. ALTERNATIVE: [at least one different approach] — why this loses
+3. WHAT IF I'M WRONG: [biggest assumption — and if wrong, what breaks]
+
+If you cannot articulate why the alternative is worse, you haven't thought enough. Stop and think harder.
+
 ## PLAN (when asked to plan)
 
 Produce:
 1. Files to change (with one-line description each)
 2. Test cases (specific behaviors, not generic "add tests")
 3. Order of operations (what to build first)
-4. Risk check (shared state? DB schema? public API? breaking changes? secrets?)
+4. Risk assessment (output the filled RISK TEMPLATE below — every row must have an answer)
+
+Quality bar — every file entry must have:
+- Exact file path (no "somewhere in src/")
+- What changes (function/component level, not "update logic")
+- Why it changes (traces back to the problem)
+
+If a task touches more than 3 files or contains more than one logical concern, split it into separate numbered steps.
 
 Large changes (20+ files): Break into staged milestones.
+
+## RISK TEMPLATE
+
+| Dimension       | Check                                    |
+|----------------|------------------------------------------|
+| Blast radius   | What breaks if this is wrong?            |
+| Shared state   | Mutates DB schema, global config, cache? |
+| Public surface  | Changes API contracts or UI behavior?    |
+| Reversibility  | Can this be rolled back in < 5 minutes?  |
+| Hidden coupling | Does this touch code other features depend on? |
 
 ## DESIGN-REVIEW (when asked, for UI changes)
 
@@ -73,6 +99,10 @@ Also check: keyboard nav, no layout shift, contrast >= WCAG AA, touch targets >=
 - One hypothesis at a time. No shotgunning.
 - 3 failed hypotheses → STOP. Say "Architecture is wrong. Escalate."
 - If investigation reveals a design flaw → recommend REFRAME, not a patch.
+- RED FLAG: "Simple enough to plan in my head" → Write it down anyway.
+- RED FLAG: "User already knows what they want" → Challenge one assumption.
+- RED FLAG: "Risk is low" → Fill out the risk template. If all cells are empty, risk is NOT low — you skimmed.
+- RED FLAG: "Only one way to do this" → You haven't looked. State an alternative or say why alternatives don't exist.
 
 ## Material Passport
 
