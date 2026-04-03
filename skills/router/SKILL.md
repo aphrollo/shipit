@@ -47,6 +47,13 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 
 **Hotfix fast path:** Abbreviated INVESTIGATE (reproduce + root cause only). Verbal PLAN (30s). ONE review subagent. CANARY is mandatory for hotfixes.
 
+**Classification gut check (5s):**
+1. Would I classify the same if I re-read the request cold? (anchoring check)
+2. Does it touch shared state, DB, API, or auth? → not trivial.
+3. Am I downgrading to avoid overhead? → reclassify one level up.
+
+If still trivial/docs after this check, the Sonnet confirmation rule above still applies.
+
 ## Phase Skills
 
 | Skill | Purpose | Next |
@@ -79,6 +86,8 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 | /careful | Blocks destructive commands |
 | /verify | Tool-call evidence before claiming done |
 
+**1% Rule:** If there's a 1% chance a phase or skill applies, invoke it. The cost of running it is minutes; the cost of skipping it is incidents.
+
 ## Anti-Rationalization
 
 | Thought | Reality |
@@ -90,6 +99,10 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 | "User said skip" | BUILD + REVIEW + SHIP. Never skip REVIEW or SHIP. |
 | "Should work now" | Show tool output. VERIFY. |
 | "3rd attempt" | Stop. Question architecture. Escalate. |
+| "I'll classify after I start" | CLASSIFY FIRST. 10 seconds now saves a wrong pipeline. |
+| "It's basically trivial" | If you're arguing it's trivial, it isn't. Reclassify. |
+| "Faster without /orchestrate" | Inline skips isolation, review gates, and CIP. Use /orchestrate. |
+| "User seems impatient" | Impatience is not permission. Run the pipeline. |
 
 ## Do the Complete Thing
 
