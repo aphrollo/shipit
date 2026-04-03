@@ -14,7 +14,8 @@ Playwright is installed at `~/.claude/tools/node_modules/playwright`. Chromium a
 ```bash
 # Check Playwright is installed and Chromium is available
 node -e "require('playwright')" 2>/dev/null && echo "PLAYWRIGHT: OK" || echo "PLAYWRIGHT: MISSING"
-ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+ls ~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+curl -s http://127.0.0.1:9222/json/version | head -1 && echo "CDP: OK" || echo "CDP: DOWN (will use standalone launch)"
 ```
 
 If either is MISSING, install before proceeding:
@@ -37,8 +38,15 @@ Write and execute a Playwright test script via Bash tool. The script should:
 ### 1. Page Load Check
 ```javascript
 const { chromium } = require('playwright');
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage();
+let browser, usedCDP = false;
+try {
+  browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+  usedCDP = true;
+} catch (e) {
+  browser = await chromium.launch({ headless: true });
+}
+const context = await browser.newContext();
+const page = await context.newPage();
 
 // Collect console errors
 const errors = [];
@@ -85,6 +93,12 @@ for (const width of [320, 768, 1920]) {
 page.on('requestfailed', req => {
   console.log('FAIL: Request failed:', req.url(), req.failure().errorText);
 });
+```
+
+### 7. Cleanup
+```javascript
+await context.close();          // always close context
+if (!usedCDP) await browser.close();  // only close browser if we launched it
 ```
 
 ## Output

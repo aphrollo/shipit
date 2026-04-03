@@ -30,8 +30,15 @@ If either is MISSING: `cd ~/.claude/tools && npm install playwright && npx playw
 
 ```javascript
 const { chromium } = require('playwright');
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage();
+let browser, usedCDP = false;
+try {
+  browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+  usedCDP = true;
+} catch (e) {
+  browser = await chromium.launch({ headless: true });
+}
+const context = await browser.newContext();
+const page = await context.newPage();
 
 await page.goto(URL, { waitUntil: 'networkidle' });
 

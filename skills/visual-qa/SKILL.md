@@ -11,7 +11,8 @@ description: Screenshot-based visual QA — capture pages, score against design 
 
 ```bash
 node -e "require('playwright')" 2>/dev/null && echo "PLAYWRIGHT: OK" || echo "PLAYWRIGHT: MISSING"
-ls ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+ls ~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome 2>/dev/null && echo "CHROMIUM: OK" || echo "CHROMIUM: MISSING"
+curl -s http://127.0.0.1:9222/json/version | head -1 && echo "CDP: OK" || echo "CDP: DOWN (will use standalone launch)"
 ```
 
 If either is MISSING: `cd ~/.claude/tools && npm install playwright && npx playwright install chromium`. If install fails after 2 attempts → escalate to user. Visual QA without screenshots is not visual QA.
@@ -31,8 +32,15 @@ If a baseline exists (previous screenshots), use it. If not, capture the current
 
 ```javascript
 const { chromium } = require('playwright');
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage();
+let browser, usedCDP = false;
+try {
+  browser = await chromium.connectOverCDP('http://127.0.0.1:9222');
+  usedCDP = true;
+} catch (e) {
+  browser = await chromium.launch({ headless: true });
+}
+const context = await browser.newContext();
+const page = await context.newPage();
 
 // Capture at key breakpoints
 for (const width of [375, 768, 1280]) {
@@ -40,6 +48,7 @@ for (const width of [375, 768, 1280]) {
   await page.goto(url);
   await page.screenshot({ path: `baseline-${width}.png`, fullPage: true });
 }
+// Cleanup: await context.close(); if (!usedCDP) await browser.close();
 ```
 
 ### 2. Capture Current State (after changes)
