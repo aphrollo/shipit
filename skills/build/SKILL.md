@@ -57,7 +57,7 @@ Everything else is banned. No restating code. No section headers. No "Initialize
 
 ### Self-check at REFACTOR
 
-Before leaving REFACTOR, scan your changes for: (1) any comment that restates code — delete it, (2) any variable named `data`/`result`/`info`/`temp`/`val` — rename it, (3) any production function with one caller — consider inlining.
+Before leaving REFACTOR, scan your changes for: (1) any comment that restates code — delete it, (2) any variable named `data`/`result`/`info`/`temp`/`val` — rename it, (3) any production function with one caller — consider inlining, (4) any workaround that misrepresents production behavior (hardcoded returns, fake branches, stubbed logic where real logic is expected) — replace it with the proper implementation. Faithful simplifications are fine. If the proper solution is out of scope, treat it as scope creep: STOP and escalate to /plan.
 
 ## Scope Creep
 

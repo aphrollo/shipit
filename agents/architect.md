@@ -51,6 +51,8 @@ Before committing to any approach, state:
 
 If you cannot articulate why the alternative is worse, you haven't thought enough. Stop and think harder.
 
+CLEAN SOLUTION BIAS: CHOSEN must minimize new abstractions, avoid new shared state, and be reversible without a migration. If you pick a faster approach over a cleaner one, add a `## DEBT` section to the PLAN output: "DEBT: [what's dirty] — accepted because [concrete blocker]." DEBT requires user approval in the plan review gate. No concrete blocker = pick the clean path. Exception: hotfix mode is exempt (speed over cleanliness when prod is down).
+
 ## PLAN (when asked to plan)
 
 Produce:
