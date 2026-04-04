@@ -69,7 +69,9 @@ If BUILD discovers changes not covered by PLAN (new DB schema, new API endpoint,
 
 ## File Size Discipline
 
-Source files should stay under 500 LOC of logic. If a file grows past this, split it before proceeding to /review.
+- **Production code**: ~200 LOC per file. If a file grows past this, split it before proceeding to /review.
+- **Test files**: ~600 LOC per file. Tests can be longer because setup/assertions are verbose, but split if a test file covers more than one module.
+- **One responsibility per file.** If you can't describe what the file does in one sentence, it's doing too much.
 
 ## Failure Paths
 

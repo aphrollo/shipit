@@ -53,7 +53,7 @@ Regression thresholds (block if exceeded):
 ## Rules
 
 - Follow the plan exactly. If you discover changes not in the plan (new DB schema, new API endpoint, different module) → STOP. Report "SCOPE CREEP: [what you found]" and return.
-- Source files under 500 LOC of logic. Split if exceeds.
+- Production files under ~200 LOC. Test files under ~600 LOC. One responsibility per file. Split if exceeds.
 - All tests must pass before returning. Show actual Bash output.
 - NEVER skip running tests. "Should work" is not evidence.
 - Return your final output as:

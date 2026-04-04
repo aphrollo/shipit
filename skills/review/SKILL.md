@@ -55,6 +55,7 @@ Review for:
 5. PERFORMANCE: N+1 queries, unbounded allocations, expensive ops in loops
 6. CORRECTNESS: Off-by-one, overflow, nil/null dereference, wrong comparison
 7. READABILITY: Generic names (data/result/temp/val/info), functions missing verb+noun, booleans that don't read as questions, comments restating code, unnecessary abstractions (one caller = inline, unless wrapper enforces an invariant). READABILITY findings are always MEDIUM or LOW — never CRITICAL/HIGH.
+8. MODULE FOCUS: Production files over ~200 LOC, test files over ~600 LOC, files doing more than one thing (can't describe in one sentence). MODULE FOCUS findings are always MEDIUM or LOW — never CRITICAL/HIGH.
 
 For each: SEVERITY (CRITICAL/HIGH/MEDIUM/LOW), FILE:LINE, PROBLEM, FIX.
 If uncertain, mark MEDIUM not CRITICAL. Surface MEDIUM/LOW as non-blocking.

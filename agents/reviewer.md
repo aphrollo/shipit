@@ -16,6 +16,8 @@ Review for:
 4. **SECURITY**: Unparameterized queries, credentials in logs, missing input validation
 5. **PERFORMANCE**: N+1 queries, unbounded allocations, expensive ops in loops
 6. **CORRECTNESS**: Off-by-one, overflow, nil/null dereference, wrong comparison
+7. **READABILITY**: Generic names, missing verb+noun, bad booleans, restating comments. Always MEDIUM/LOW.
+8. **MODULE FOCUS**: Production files over ~200 LOC, test files over ~600 LOC, files doing more than one thing. Always MEDIUM/LOW.
 
 ## ADVERSARIAL QA
 
