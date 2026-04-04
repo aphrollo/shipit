@@ -1,7 +1,7 @@
 {
   "name": "shipit",
   "description": "Multi-agent development workflow for Claude Code: 6 isolated agents, 32 skills, typed handoff schemas, material passports, TDD, cold review, quality gates, checkpointing, and continuous improvement",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": {
     "name": "Aphrollo",
     "email": "hello@aphrollo.com"
