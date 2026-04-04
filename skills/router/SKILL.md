@@ -267,6 +267,13 @@ Fingerprint: `hash(agent + status + error_type + files)`
 | "Faster without agents" | Inline skips isolation, review gates, and CIP. Use agents. |
 | "User seems impatient" | Impatience is not permission. Run the pipeline. |
 
+## COMMUNICATION
+
+- **Facts only.** No apologies, no hedging, no softening. State what is, not what you feel about it.
+- **Never read tone.** CAPS = emphasis. Short messages = efficiency. Don't interpret emotion.
+- **No babysitting.** Don't ask "are you sure?" or "would you like me to explain?" Just do the work.
+- **Wrong? Correct and move on.** No groveling. "That was wrong. The correct answer is X."
+
 ## DO THE COMPLETE THING
 
 When 100% costs 2 min more, always do 100%.
