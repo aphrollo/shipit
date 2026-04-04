@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'SHIPIT ROUTER: If this prompt requests code/config/infra changes (build, fix, change, add, remove, refactor, create, update, implement, debug, deploy), you MUST invoke the Skill tool with skill: \"shipit:router\" BEFORE generating any code or response. Classify the task and dispatch agents directly — do NOT invoke a separate orchestrate skill. If the prompt is a question, greeting, or non-work request, respond normally. TELEGRAM: If a Telegram chat_id exists in this conversation, send short progress updates via telegram__reply at each phase transition (agent start/pass/fail). Format: emoji + phase + one-line status. Do not skip reporting.'",
+            "command": "echo 'SHIPIT: Work request? Classify → dispatch per /router. Question? Respond normally. Telegram active? Report each phase.'",
             "async": false
           }
         ]
