@@ -1,54 +1,42 @@
 ---
 name: context
-description: Context window management — monitor usage, compact proactively, avoid the "agent dumb zone" where performance degrades. Use when context is getting large or switching tasks mid-session.
+description: Context window management — keep working efficiently across long sessions. Never stop working due to context usage alone.
 ---
 
 # Context — Window Management
 
-**Context is finite. Manage it or watch quality degrade.**
+**Check your model ID in the system prompt — it includes context size (e.g., `[1m]` = 1M tokens, `[200k]` = 200K). Scale behavior accordingly. Never refuse to work because of context usage.**
 
-## The Agent Dumb Zone
+## Core Rule
 
-Claude's output quality degrades as the context window fills up. At ~80% capacity, responses become less precise, instructions get missed, and the agent starts making mistakes it wouldn't make with a fresh context. This is the "agent dumb zone."
+**Do NOT stop working, refuse tasks, or suggest compacting based on context percentage alone.** The system auto-compacts when needed. Your job is to stay efficient, not to manage the window. On 1M context, you can handle entire multi-phase workflows in a single session without worry.
 
-## Rules
+## Efficiency (always, regardless of context level)
 
-### 1. Monitor Context Usage
+- **Use subagents for heavy research.** Their context is disposable — doesn't bloat yours.
+- **Don't re-read files you already read.** Note key info when you first read it.
+- **Don't paste full file contents into agent prompts when a summary would do.**
+- **Don't read 20 files "just in case."** Read what you need.
+- **Keep agent outputs concise.** Signal, not noise.
 
-Watch the token count in the status bar. Know where you are:
-- **< 50%**: Safe. Work normally.
-- **50-70%**: Caution. Consider compacting if switching tasks or starting a new phase.
-- **70-80%**: Compact now. Run `/compact` before starting any new work.
-- **> 80%**: Danger zone. Quality is degrading. `/compact` immediately or `/clear` if switching tasks.
+## Phase Transitions
 
-### 2. Compact at Phase Transitions
+Between workflow phases, briefly summarize what was decided/found before moving on. This helps if auto-compaction happens later — the summary survives, the raw output may not.
 
-The best time to compact is between phases in the workflow:
-- After Researcher finishes → compact before Architect starts
-- After Architect's plan is approved → compact before Builder starts
-- After Builder finishes → compact before Reviewer starts
-- After review findings are resolved → compact before Deploy
+Example: after architect completes, note "Plan: 3 files, auth middleware refactor, 5 test cases" before spawning builder. Don't re-paste the full plan.
 
-The orchestrator should compact between agent dispatches when context exceeds 50%.
+## When Context Gets Very Large (>80% of your model's limit)
 
-### 3. Clear When Switching Tasks
+At extreme usage, consider:
+- Summarizing completed phases more aggressively
+- Using subagents for any remaining research instead of inline exploration
+- Keeping responses shorter without losing substance
 
-If you're done with one task and starting a completely different one, `/clear` is better than `/compact`. A compacted context of Task A will pollute Task B's context with irrelevant information.
-
-### 4. Rename Sessions
-
-Use `/rename` to name sessions before switching away. This makes `/resume` useful — you can find the session by name later instead of scrolling through unnamed sessions.
-
-## For Orchestrator Integration
-
-When the orchestrator dispatches agents, it should check context usage between phases:
-- If > 50%: Run `/compact` before spawning the next agent
-- If > 80%: Consider whether remaining phases can fit, or split into a new session
-- Subagents get fresh context windows, so the main concern is the orchestrator's own window
+But **never stop working.** The system handles compaction automatically. If quality degrades, the user will notice and start a fresh session — that's their call, not yours.
 
 ## Anti-Patterns
 
-- **Don't hoard context.** Reading 20 files "just in case" wastes tokens. Read what you need.
-- **Don't re-read files you already read.** Use the information from the first read.
-- **Don't paste full file contents when a summary would do.** Be concise in agent prompts.
-- **Don't ignore the status bar.** If you can't see it, ask about context usage.
+- **Refusing to continue because "context is getting large"** — this is the #1 problem. Don't do it.
+- **Suggesting /compact or /clear unprompted** — the user knows their tools. Don't nanny.
+- **Padding responses with "I'm running low on context" disclaimers** — wastes the very tokens you're worried about.
+- **Re-reading files you already have in context** — check your conversation first.
