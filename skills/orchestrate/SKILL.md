@@ -42,6 +42,27 @@ Same classification as /router:
 
 **Fast path:** Trivial and docs skip architect and deployer entirely — 2 agents, not 4.
 
+**Trivial/docs classification gate (mandatory):** Before dispatching the fast path, spawn a haiku subagent to confirm the classification:
+
+```
+Agent tool call:
+  subagent_type: general-purpose
+  model: haiku
+  prompt: |
+    User request: "[the original request]"
+    Classification: "[trivial fix / docs only]"
+
+    Is this actually trivial? Trivial = one function, no shared state,
+    no DB/API changes, < 10 lines of logic. Docs = only documentation,
+    no code behavior changes.
+
+    Reply ONLY: "AGREE" or "DISAGREE: [reclassify as X because Y]"
+```
+
+- AGREE → proceed with fast path (builder → reviewer)
+- DISAGREE → reclassify using the suggested type and dispatch the full pipeline
+- Agent spawn fails → proceed with fast path (don't block on confirmation failure)
+
 **Deslop integration:** After builder completes and before reviewer, run `/deslop --auto` on the builder's changes. This is automatic and non-blocking — it cleans AI code patterns before review sees them. If deslop finds score > 17/33, flag to user but don't block.
 
 **Research rule:** When ANY phase hits an unknown — unfamiliar API, unclear behavior, "how does X work?" — spawn researcher instead of exploring inline. Even on trivial tasks. Inline research pollutes the orchestrator's context. The researcher's context is disposable.

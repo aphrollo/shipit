@@ -43,7 +43,7 @@ Why: Inline execution skips agent isolation, context separation, and mechanical 
 - Bug requiring behavior/interface change → Feature Change (REFRAME)
 - Touches secrets/deployment/networking → include PLAN
 - "Trivial" = one function, no shared state, no DB/API, < 10 lines. **If in doubt, not trivial.**
-- Trivial/docs classification requires Sonnet subagent confirmation. DISAGREE → reclassify.
+- Trivial/docs classification requires haiku subagent confirmation (enforced mechanically in orchestrator). DISAGREE → reclassify.
 
 **Hotfix fast path:** Abbreviated INVESTIGATE (reproduce + root cause only). Verbal PLAN (30s). ONE review subagent. CANARY is mandatory for hotfixes.
 
