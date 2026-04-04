@@ -34,7 +34,7 @@ The orchestrator's **designer agent** runs /design when DESIGN.md doesn't exist,
 
 - Runs after Architect (plan) and before Builder
 - Output constrains what Builder implements
-- Uses the Designer agent when invoked via /orchestrate
+- Uses the Designer agent when dispatched by /router
 - Can be run standalone for design audits on existing UI
 
 ## DESIGN.md Location

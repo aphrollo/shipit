@@ -18,7 +18,7 @@ Never reference details that only appeared in CLI output. If the user hasn't bee
 Active when ALL are true:
 1. `telegram__reply` tool is available
 2. A `chat_id` exists from an inbound Telegram message
-3. Workflow is running via `/orchestrate`
+3. Workflow is running via `/router`
 
 If any condition is missing → skip silently. No errors.
 
@@ -90,4 +90,4 @@ Track what the user has been told via Telegram vs what exists only in CLI:
 
 ## Integration
 
-The dispatch loop in `/orchestrate` Step 3 handles all reporting. The orchestrator calls `telegram__reply` directly — no subagent spawn needed for status messages. See `orchestrate/SKILL.md` Step 3 for the full loop.
+The dispatch loop in `/router` Step 3 handles all reporting. The router calls `telegram__reply` directly — no subagent spawn needed for status messages. See `router/SKILL.md` Step 3 for the full loop.

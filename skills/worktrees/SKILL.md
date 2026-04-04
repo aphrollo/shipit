@@ -12,7 +12,7 @@ description: When starting feature work needing isolation, before executing impl
 - Starting feature work that needs isolation from the main working tree
 - Before executing an implementation plan (from /plan) that touches many files
 - Parallel development on multiple features simultaneously
-- When an /orchestrate agent spawns builders that need independent workspaces
+- When /router dispatches builders that need independent workspaces
 
 ## Directory Selection Priority
 
@@ -112,9 +112,9 @@ git worktree list
 git worktree prune
 ```
 
-## Integration with /orchestrate
+## Integration with /router
 
-When the orchestrator spawns builder agents for parallel work, it can assign each agent its own worktree:
+When the router dispatches builder agents for parallel work, it can assign each agent its own worktree:
 
 - Each builder agent gets an isolated worktree with its own branch
 - Agents can run tests independently without interfering with each other
