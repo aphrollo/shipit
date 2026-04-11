@@ -1,20 +1,20 @@
 {
   "name": "shipit-marketplace",
-  "description": "shipit",
+  "description": "shipit — attribution-free git workflows by Aphrollo",
   "owner": {
     "name": "Aphrollo",
     "email": "hello@aphrollo.com"
   },
   "metadata": {
-    "description": "shipit",
-    "version": "0.0.1"
+    "description": "Attribution-free git workflows and tools",
+    "version": "0.0.2"
   },
   "plugins": [
     {
       "name": "shipit",
       "source": "./",
-      "description": "shipit",
-      "version": "0.0.1",
+      "description": "Attribution-free git workflow: /commit, /commit-push-pr, /clean_gone, undercover skill",
+      "version": "0.0.2",
       "strict": true
     }
   ]
