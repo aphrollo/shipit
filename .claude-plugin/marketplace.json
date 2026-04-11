@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "Attribution-free git workflows and tools",
-    "version": "0.0.2"
+    "version": "0.0.3"
   },
   "plugins": [
     {
       "name": "shipit",
       "source": "./",
-      "description": "Attribution-free git workflow: /commit, /commit-push-pr, /clean_gone, undercover skill",
-      "version": "0.0.2",
+      "description": "Attribution-free git workflow: /commit, /commit-push-pr, /clean_gone — always undercover",
+      "version": "0.0.3",
       "strict": true
     }
   ]

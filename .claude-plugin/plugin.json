@@ -1,7 +1,7 @@
 {
   "name": "shipit",
-  "version": "0.0.2",
-  "description": "Attribution-free git workflow for Claude Code: /commit, /commit-push-pr, /clean_gone, and an undercover setup skill that strips AI fingerprints project-wide.",
+  "version": "0.0.3",
+  "description": "Attribution-free git workflow for Claude Code. /commit, /commit-push-pr, and /clean_gone always write commits and PRs as a human developer — no Co-Authored-By, no 'Generated with Claude Code', no AI fingerprints.",
   "author": {
     "name": "Aphrollo",
     "email": "hello@aphrollo.com"
