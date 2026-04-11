@@ -1,0 +1,21 @@
+{
+  "name": "shipit-marketplace",
+  "description": "shipit",
+  "owner": {
+    "name": "Aphrollo",
+    "email": "hello@aphrollo.com"
+  },
+  "metadata": {
+    "description": "shipit",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "shipit",
+      "source": "./",
+      "description": "shipit",
+      "version": "0.0.1",
+      "strict": true
+    }
+  ]
+}

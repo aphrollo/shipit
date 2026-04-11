@@ -1,0 +1,12 @@
+{
+  "name": "shipit",
+  "version": "0.0.1",
+  "description": "shipit",
+  "author": {
+    "name": "Aphrollo",
+    "email": "hello@aphrollo.com"
+  },
+  "homepage": "https://github.com/aphrollo/shipit",
+  "repository": "https://github.com/aphrollo/shipit",
+  "license": "MIT"
+}
