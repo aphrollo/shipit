@@ -1,20 +1,20 @@
 {
   "name": "shipit-marketplace",
-  "description": "shipit — attribution-free git workflows by Aphrollo",
+  "description": "shipit — opinionated Claude Code workflow by Aphrollo",
   "owner": {
     "name": "Aphrollo",
     "email": "hello@aphrollo.com"
   },
   "metadata": {
-    "description": "Attribution-free git workflows and tools",
-    "version": "0.0.3"
+    "description": "Opinionated workflow: attribution-free commits plus idea→spec→issues→TDD→architecture skills",
+    "version": "0.0.4"
   },
   "plugins": [
     {
       "name": "shipit",
       "source": "./",
-      "description": "Attribution-free git workflow: /commit, /commit-push-pr, /clean_gone — always undercover",
-      "version": "0.0.3",
+      "description": "Opinionated workflow: /commit, /commit-push-pr, /clean_gone plus grill-me, write-a-prd, prd-to-issues, tdd, improve-codebase-architecture",
+      "version": "0.0.4",
       "strict": true
     }
   ]

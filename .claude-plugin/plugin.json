@@ -1,7 +1,7 @@
 {
   "name": "shipit",
-  "version": "0.0.3",
-  "description": "Attribution-free git workflow for Claude Code. /commit, /commit-push-pr, and /clean_gone always write commits and PRs as a human developer — no Co-Authored-By, no 'Generated with Claude Code', no AI fingerprints.",
+  "version": "0.0.4",
+  "description": "Opinionated workflow for Claude Code. Commands for attribution-free commits and PRs (/commit, /commit-push-pr, /clean_gone). Auto-activating skills for the full loop from idea to ship: grill-me, write-a-prd, prd-to-issues, tdd, improve-codebase-architecture.",
   "author": {
     "name": "Aphrollo",
     "email": "hello@aphrollo.com"
